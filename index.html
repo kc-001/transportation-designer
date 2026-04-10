@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransportationDesigner — Engineering Tools for FDOT & State DOT Staff</title>
+<meta name="description" content="Precision web tools built for Florida transportation designers. Section analysis, curve checking, superelevation calculations — in your browser, no install required.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:       #0f2340;
+  --navy-mid:   #1a3557;
+  --navy-light: #234570;
+  --blue:       #1B6AC9;
+  --blue-light: #3B8FE8;
+  --blue-dim:   rgba(27,106,201,0.10);
+  --blue-border:rgba(27,106,201,0.25);
+  --sand:       #F5F2ED;
+  --sand2:      #EDE9E2;
+  --sand3:      #DDD8CF;
+  --text:       #0f2340;
+  --text2:      #3D5470;
+  --text3:      #7A90A8;
+  --white:      #FFFFFF;
+  --ok:         #0D7A4E;
+  --ok-dim:     rgba(13,122,78,0.10);
+  --warn:       #C47D0A;
+  --radius:     10px;
+  --radius-lg:  16px;
+  --serif:      'DM Serif Display', Georgia, serif;
+  --sans:       'DM Sans', system-ui, sans-serif;
+  --shadow-sm:  0 1px 3px rgba(15,35,64,0.08), 0 1px 2px rgba(15,35,64,0.04);
+  --shadow-md:  0 4px 16px rgba(15,35,64,0.10), 0 1px 4px rgba(15,35,64,0.06);
+  --shadow-lg:  0 12px 40px rgba(15,35,64,0.13), 0 4px 12px rgba(15,35,64,0.07);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--white);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes drawLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.reveal { opacity: 0; animation: fadeUp 0.65s cubic-bezier(0.22,1,0.36,1) forwards; }
+.reveal-1 { animation-delay: 0.05s; }
+.reveal-2 { animation-delay: 0.15s; }
+.reveal-3 { animation-delay: 0.25s; }
+.reveal-4 { animation-delay: 0.35s; }
+.reveal-5 { animation-delay: 0.45s; }
+.reveal-6 { animation-delay: 0.55s; }
+.reveal-7 { animation-delay: 0.65s; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--sand3);
+  padding: 0 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo {
+  width: 34px; height: 34px; background: var(--navy);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 1.8; }
+.nav-wordmark { font-family: var(--serif); font-size: 17px; color: var(--navy); letter-spacing: -0.01em; line-height: 1; }
+.nav-wordmark span { color: var(--blue); }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a { font-size: 13px; font-weight: 500; color: var(--text2); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover { color: var(--blue); }
+.nav-cta {
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  background: var(--navy); color: white; border: none;
+  padding: 8px 18px; border-radius: var(--radius); cursor: pointer;
+  text-decoration: none; transition: background 0.15s, transform 0.1s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.nav-cta:hover { background: var(--navy-light); transform: translateY(-1px); }
+.nav-cta svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--navy);
+  position: relative; overflow: hidden;
+  padding: 7rem 2.5rem 6rem;
+  text-align: center;
+}
+.hero-grid-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.hero-glow {
+  position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(27,106,201,0.35) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(27,106,201,0.18); border: 1px solid rgba(27,106,201,0.35);
+  color: #7ab8f5; font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 1.75rem;
+  text-transform: uppercase;
+}
+.hero-badge-dot { width: 6px; height: 6px; background: #3B8FE8; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+.hero h1 {
+  font-family: var(--serif); font-size: clamp(2.4rem, 5vw, 3.75rem);
+  color: white; line-height: 1.12; letter-spacing: -0.02em;
+  max-width: 780px; margin: 0 auto 1.5rem;
+}
+.hero h1 em { font-style: italic; color: #7ab8f5; }
+.hero-sub {
+  font-size: clamp(1rem, 1.8vw, 1.125rem); color: rgba(255,255,255,0.6);
+  max-width: 560px; margin: 0 auto 2.5rem; font-weight: 300; line-height: 1.75;
+}
+.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-hero-primary {
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  background: var(--blue); color: white; border: none;
+  padding: 13px 28px; border-radius: var(--radius); cursor: pointer;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  box-shadow: 0 4px 20px rgba(27,106,201,0.4);
+}
+.btn-hero-primary:hover { background: var(--blue-light); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(27,106,201,0.45); }
+.btn-hero-primary svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+.btn-hero-secondary {
+  font-family: var(--sans); font-size: 14px; font-weight: 400;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.16);
+  padding: 13px 28px; border-radius: var(--radius); cursor: pointer;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: background 0.15s, transform 0.12s;
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
+
+.hero-stats {
+  display: flex; justify-content: center; gap: 3rem;
+  margin-top: 4rem; padding-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.stat-item { text-align: center; }
+.stat-num { font-family: var(--serif); font-size: 2rem; color: white; line-height: 1; }
+.stat-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ── SECTION SHELL ── */
+section { padding: 5rem 2.5rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--blue); margin-bottom: 1rem;
+}
+.section-tag::before { content:''; display:block; width:20px; height:2px; background:var(--blue); border-radius:1px; }
+h2.section-title {
+  font-family: var(--serif); font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  color: var(--navy); line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 0.75rem;
+}
+.section-sub { font-size: 1.0625rem; color: var(--text2); max-width: 560px; line-height: 1.75; font-weight: 300; }
+
+/* ── TOOLS GRID ── */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px; margin-top: 3rem;
+}
+.tool-card {
+  background: var(--white); border: 1px solid var(--sand3);
+  border-radius: var(--radius-lg); padding: 1.75rem;
+  text-decoration: none; color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex; flex-direction: column; gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  position: relative; overflow: hidden;
+}
+.tool-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--blue-dim) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.25s;
+}
+.tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--blue-border); }
+.tool-card:hover::after { opacity: 1; }
+.tool-card.coming-soon { opacity: 0.72; cursor: default; }
+.tool-card.coming-soon:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--sand3); }
+.tool-card.coming-soon::after { display: none; }
+
+.tool-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--navy); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tool-icon svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 1.6; }
+.tool-card.coming-soon .tool-icon { background: var(--sand2); }
+.tool-card.coming-soon .tool-icon svg { stroke: var(--text3); }
+
+.tool-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.tool-status {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 9px; border-radius: 20px;
+}
+.status-live { background: var(--ok-dim); color: var(--ok); }
+.status-soon { background: var(--sand2); color: var(--text3); }
+
+.tool-name { font-family: var(--serif); font-size: 1.2rem; color: var(--navy); line-height: 1.25; }
+.tool-desc { font-size: 13.5px; color: var(--text2); line-height: 1.65; font-weight: 300; flex: 1; }
+.tool-footer {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 500; color: var(--blue);
+  margin-top: 0.25rem;
+}
+.tool-footer svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; transition: transform 0.15s; }
+.tool-card:hover .tool-footer svg { transform: translateX(3px); }
+.tool-card.coming-soon .tool-footer { color: var(--text3); }
+
+/* ── WHY SECTION ── */
+.why-section { background: var(--sand); }
+.why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin-top: 3rem; }
+.why-item { display: flex; flex-direction: column; gap: 0.75rem; }
+.why-icon {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--white);
+  border: 1px solid var(--sand3); display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+.why-icon svg { width: 19px; height: 19px; stroke: var(--navy); fill: none; stroke-width: 1.8; }
+.why-item h3 { font-family: var(--serif); font-size: 1.1rem; color: var(--navy); }
+.why-item p { font-size: 13.5px; color: var(--text2); line-height: 1.7; font-weight: 300; }
+
+/* ── HOW IT WORKS ── */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; margin-top: 3rem; position: relative; }
+.steps::before {
+  content: ''; position: absolute; top: 22px; left: 5%; right: 5%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sand3) 20%, var(--sand3) 80%, transparent);
+  transform-origin: left; animation: drawLine 1s 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+.step { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 1.5rem; gap: 1rem; }
+.step-num {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--navy);
+  font-family: var(--serif); font-size: 1.1rem; color: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1; position: relative;
+}
+.step h3 { font-size: 14px; font-weight: 600; color: var(--navy); }
+.step p { font-size: 13px; color: var(--text2); line-height: 1.6; font-weight: 300; }
+
+/* ── NOTIFY SECTION ── */
+.notify-section { background: var(--navy); }
+.notify-inner { max-width: 640px; margin: 0 auto; text-align: center; }
+.notify-inner h2 { font-family: var(--serif); font-size: clamp(1.8rem,3vw,2.3rem); color: white; margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+.notify-inner p { font-size: 1rem; color: rgba(255,255,255,0.55); margin-bottom: 2rem; font-weight: 300; }
+.notify-form { display: flex; gap: 10px; max-width: 480px; margin: 0 auto; }
+.notify-input {
+  flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--radius); color: white; font-family: var(--sans); font-size: 14px;
+  padding: 12px 16px; outline: none; transition: border-color 0.15s;
+}
+.notify-input::placeholder { color: rgba(255,255,255,0.35); }
+.notify-input:focus { border-color: rgba(27,106,201,0.6); }
+.notify-btn {
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  background: var(--blue); color: white; border: none; border-radius: var(--radius);
+  padding: 12px 22px; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, transform 0.12s;
+}
+.notify-btn:hover { background: var(--blue-light); transform: translateY(-1px); }
+.notify-note { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 12px; }
+#notifySuccess {
+  display: none; background: var(--ok-dim); border: 1px solid rgba(13,122,78,0.3);
+  color: #5fcea0; padding: 12px 20px; border-radius: var(--radius);
+  font-size: 14px; max-width: 480px; margin: 0 auto;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--navy-mid); border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 2.5rem 2.5rem;
+}
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-brand { font-family: var(--serif); font-size: 15px; color: rgba(255,255,255,0.7); }
+.footer-brand span { color: #7ab8f5; }
+.footer-links { display: flex; gap: 1.5rem; }
+.footer-links a { font-size: 12px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.15s; }
+.footer-links a:hover { color: rgba(255,255,255,0.7); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 1.25rem; }
+  .nav-links { display: none; }
+  .hero { padding: 4.5rem 1.25rem 4rem; }
+  section { padding: 4rem 1.25rem; }
+  .steps::before { display: none; }
+  .step { padding: 0 0.5rem; }
+  .notify-form { flex-direction: column; }
+  footer { padding: 2rem 1.25rem; }
+  .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="/">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="nav-wordmark">Transportation<span>Designer</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#tools">Tools</a>
+    <a href="#why">Why TD</a>
+    <a href="#how">How It Works</a>
+    <a href="#notify">Stay Updated</a>
+  </div>
+  <a class="nav-cta" href="tools/typical-section/index.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Open a Tool
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding-top:7rem;padding-bottom:6rem;">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+
+  <div class="reveal reveal-1">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Built for FDOT &amp; State DOT Engineers
+    </div>
+  </div>
+
+  <h1 class="reveal reveal-2">
+    Precision tools for<br><em>transportation designers</em>
+  </h1>
+
+  <p class="hero-sub reveal reveal-3">
+    Browser-based engineering calculators and analyzers built to the standards FDOT designers work with every day. No installs. No licenses. Open a tool and get to work.
+  </p>
+
+  <div class="hero-actions reveal reveal-4">
+    <a class="btn-hero-primary" href="#tools">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Browse Tools
+    </a>
+    <a class="btn-hero-secondary" href="#how">
+      How it works
+    </a>
+  </div>
+
+  <div class="hero-stats reveal reveal-5">
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Tools Launching</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Installs Required</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">FDOT</div>
+      <div class="stat-label">Standards Aligned</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">Free</div>
+      <div class="stat-label">During Beta</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-inner">
+    <div class="reveal reveal-1">
+      <div class="section-tag">Tools</div>
+      <h2 class="section-title">Engineering tools,<br>ready when you are</h2>
+      <p class="section-sub">Each tool is purpose-built for a specific design task. Open in any browser, share a link with your team, no account needed.</p>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- LIVE -->
+      <a class="tool-card reveal reveal-2" href="tools/typical-section/index.html">
+        <div class="tool-header">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4"/><path d="M6 12v0M18 12v0" stroke-width="2.5"/></svg>
+          </div>
+          <span class="tool-status status-live">Live</span>
+        </div>
+        <div>
+          <div class="tool-name">Typical Section Analyzer</div>
+          <p class="tool-desc">Configure and compare roadway cross-section widths for divided highways. Checks MSE wall and column clearance constraints in real time.</p>
+        </div>
+        <div class="tool-footer">
+          Open tool
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- COMING SOON -->
+      <div class="tool-card coming-soon reveal reveal-3">
+        <div class="tool-header">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M7 3v6M17 3v6"/><path d="M7 14h4M7 17h2"/></svg>
+          </div>
+          <span class="tool-status status-soon">Coming Soon</span>
+        </div>
+        <div>
+          <div class="tool-name">Pavement Sketch &amp; Summary Sheets</div>
+          <p class="tool-desc">Generate pavement design sketches and formatted summary sheets for project documentation, aligned to FDOT pavement design standards.</p>
+        </div>
+        <div class="tool-footer">
+          Notify me when live
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon reveal reveal-4">
+        <div class="tool-header">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/><path d="M12 8v4l3 3"/><path d="M3.6 9h16.8M3.6 15h16.8"/></svg>
+          </div>
+          <span class="tool-status status-soon">Coming Soon</span>
+        </div>
+        <div>
+          <div class="tool-name">Horizontal Curve &amp; HSO Checker</div>
+          <p class="tool-desc">Calculate horizontal curve geometry and verify horizontal sight obstructions against FDOT design speed criteria and stopping sight distance requirements.</p>
+        </div>
+        <div class="tool-footer">
+          Notify me when live
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon reveal reveal-5">
+        <div class="tool-header">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          </div>
+          <span class="tool-status status-soon">Coming Soon</span>
+        </div>
+        <div>
+          <div class="tool-name">Vertical Curve Checker</div>
+          <p class="tool-desc">Verify crest and sag vertical curve lengths against sight distance and comfort criteria. Flags non-compliant K-values for your design speed.</p>
+        </div>
+        <div class="tool-footer">
+          Notify me when live
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon reveal reveal-6">
+        <div class="tool-header">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/></svg>
+          </div>
+          <span class="tool-status status-soon">Coming Soon</span>
+        </div>
+        <div>
+          <div class="tool-name">Superelevation Calculator</div>
+          <p class="tool-desc">Compute superelevation rates and runoff lengths for horizontal curves. Outputs transition diagrams and tabulated superelevation data by station.</p>
+        </div>
+        <div class="tool-footer">
+          Notify me when live
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER CARD -->
+      <div class="tool-card coming-soon reveal reveal-7" style="border-style:dashed;background:var(--sand);box-shadow:none;">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0.75rem;padding:1rem 0;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--sand2);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div style="font-size:13px;color:var(--text3);line-height:1.5;">More tools in development.<br>Suggest one below.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why" class="why-section">
+  <div class="section-inner">
+    <div class="reveal reveal-1">
+      <div class="section-tag">Why TransportationDesigner</div>
+      <h2 class="section-title">Built for how DOT<br>designers actually work</h2>
+      <p class="section-sub">These tools aren't adapted from general-purpose software. They're purpose-built around FDOT standards, project workflows, and the calculations designers run every day.</p>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-item reveal reveal-2">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>FDOT Standards Aligned</h3>
+        <p>Constraint limits, lane widths, and design criteria match current FDOT Design Standards and PPM. No translating between tools and specifications.</p>
+      </div>
+      <div class="why-item reveal reveal-3">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h3>No IT Approval Required</h3>
+        <p>Runs entirely in the browser. Nothing to install, no admin rights needed, no VPN required. Share a link and it works.</p>
+      </div>
+      <div class="why-item reveal reveal-4">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Open, Inspectable Logic</h3>
+        <p>Every calculation is transparent. Engineers can see the formulas, verify the math, and trust the output — or catch an error before it reaches a set of plans.</p>
+      </div>
+      <div class="why-item reveal reveal-5">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>Built for Project Teams</h3>
+        <p>Share a configuration URL with a colleague or reviewer. Everyone sees the same numbers without emailing spreadsheets back and forth.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="reveal reveal-1">
+      <div class="section-tag">How It Works</div>
+      <h2 class="section-title">From browser to<br>design decision in minutes</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal reveal-2">
+        <div class="step-num">1</div>
+        <h3>Open a tool</h3>
+        <p>Click any tool from the directory. It loads instantly in your browser — desktop or tablet.</p>
+      </div>
+      <div class="step reveal reveal-3">
+        <div class="step-num">2</div>
+        <h3>Enter your parameters</h3>
+        <p>Input lane widths, design speeds, or curve geometry. Results update live as you adjust.</p>
+      </div>
+      <div class="step reveal reveal-4">
+        <div class="step-num">3</div>
+        <h3>Check constraints</h3>
+        <p>The tool flags anything that falls outside FDOT standard ranges — MSE limits, sight distances, K-values.</p>
+      </div>
+      <div class="step reveal reveal-5">
+        <div class="step-num">4</div>
+        <h3>Export or share</h3>
+        <p>Download a CSV or JSON summary, print to PDF, or copy the URL to share your configuration with a reviewer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOTIFY -->
+<section id="notify" class="notify-section">
+  <div class="notify-inner">
+    <div class="reveal reveal-1">
+      <h2>New tools launching soon</h2>
+      <p>The Horizontal Curve Checker, Vertical Curve Checker, and Superelevation Calculator are in development. Get notified when they go live.</p>
+    </div>
+    <div class="reveal reveal-2">
+      <div class="notify-form" id="notifyForm">
+        <input class="notify-input" type="email" id="notifyEmail" placeholder="your.name@dot.state.fl.us">
+        <button class="notify-btn" onclick="handleNotify()">Notify me</button>
+      </div>
+      <div id="notifySuccess">
+        You're on the list. We'll email you when new tools are ready.
+      </div>
+      <p class="notify-note">No spam. Unsubscribe any time. Used only to announce new tools.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Transportation<span>Designer</span></div>
+    <div class="footer-links">
+      <a href="#tools">Tools</a>
+      <a href="#why">About</a>
+      <a href="#notify">Contact</a>
+    </div>
+    <div class="footer-copy">© 2025 TransportationDesigner.com</div>
+  </div>
+</footer>
+
+<script>
+function handleNotify() {
+  const email = document.getElementById('notifyEmail').value.trim();
+  if(!email || !email.includes('@')) {
+    document.getElementById('notifyEmail').focus();
+    document.getElementById('notifyEmail').style.borderColor = 'rgba(239,68,68,0.5)';
+    return;
+  }
+  document.getElementById('notifyForm').style.display = 'none';
+  document.getElementById('notifySuccess').style.display = 'block';
+}
+
+// Scroll-triggered reveal for elements below the fold
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
