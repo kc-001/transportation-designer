@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typical Section Analyzer — SR 84</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #181c27; --bg3: #1e2330;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0; --text2: #8b90a0; --text3: #555c6e;
+    --accent: #3b82f6; --accent-dim: rgba(59,130,246,0.15); --accent-border: rgba(59,130,246,0.4);
+    --ok: #22c55e; --ok-dim: rgba(34,197,94,0.12);
+    --warn: #f59e0b; --warn-dim: rgba(245,158,11,0.12);
+    --danger: #ef4444; --danger-dim: rgba(239,68,68,0.12);
+    --radius: 8px; --radius-lg: 12px;
+    --mono: 'DM Mono', monospace; --sans: 'Syne', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+  header {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-logo { width: 32px; height: 32px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .header-logo svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; }
+  .header-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .header-sub { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+  .header-actions { display: flex; gap: 8px; }
+
+  .btn {
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: var(--radius); border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); cursor: pointer;
+    transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+  .btn-primary { background: var(--accent); border-color: transparent; color: white; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-danger { background: var(--danger-dim); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .layout { display: grid; grid-template-columns: 280px 1fr 280px; min-height: calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar { background: var(--bg2); border-right: 1px solid var(--border); padding: 1.25rem 1rem; overflow-y: auto; }
+  .sidebar-section { margin-bottom: 1.75rem; }
+  .sidebar-label {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 10px; padding: 0 4px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sidebar-label-btn {
+    background: none; border: 1px solid var(--border); color: var(--text3);
+    font-family: var(--mono); font-size: 10px; cursor: pointer; padding: 2px 8px;
+    border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;
+    transition: all 0.15s; text-transform: none; letter-spacing: 0;
+  }
+  .sidebar-label-btn:hover { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
+  .sidebar-label-btn svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+  /* CONFIG ITEMS */
+  .config-item {
+    display: flex; align-items: stretch;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 4px; overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .config-item:hover { border-color: var(--border2); }
+  .config-item.active { border-color: var(--accent-border); background: var(--accent-dim); }
+  .config-item.is-custom { border-style: dashed; }
+  .config-main {
+    flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px; cursor: pointer; background: none; border: none; color: inherit;
+    font-family: var(--sans); text-align: left;
+  }
+  .config-item.active .config-main { color: var(--accent); }
+  .config-name {
+    font-size: 12px; font-weight: 500; color: var(--text2);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 158px;
+  }
+  .config-item.active .config-name { color: var(--accent); }
+  .config-w { font-family: var(--mono); font-size: 11px; color: var(--text3); flex-shrink: 0; margin-left: 6px; }
+  .config-item.active .config-w { color: var(--accent); opacity: 0.7; }
+  .config-actions { display: flex; align-items: stretch; border-left: 1px solid var(--border); }
+  .config-action-btn {
+    background: none; border: none; border-right: 1px solid var(--border); color: var(--text3);
+    cursor: pointer; padding: 0 8px; display: flex; align-items: center; transition: color 0.12s, background 0.12s;
+  }
+  .config-action-btn:last-child { border-right: none; }
+  .config-action-btn:hover { background: rgba(255,255,255,0.04); }
+  .config-action-btn.rename:hover { color: var(--accent); }
+  .config-action-btn.delete:hover { color: var(--danger); }
+  .config-action-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .config-name-input {
+    flex: 1; background: var(--bg3); border: none; outline: 1px solid var(--accent-border);
+    color: var(--text); font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 0 6px; border-radius: 3px; width: 100%;
+  }
+
+  /* SLIDERS */
+  .slider-group { margin-bottom: 14px; padding: 0 4px; }
+  .slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .slider-name { font-size: 12px; color: var(--text2); }
+  .slider-val { font-family: var(--mono); font-size: 12px; color: var(--text); background: var(--bg3); padding: 2px 6px; border-radius: 4px; min-width: 36px; text-align: center; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: var(--bg3); border-radius: 2px; outline: none; cursor: pointer; accent-color: var(--accent); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; border: 2px solid var(--bg); transition: transform 0.1s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* MAIN */
+  .main { padding: 1.5rem; overflow-y: auto; }
+  .metrics-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .metric-label { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .metric-value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .metric-unit { font-size: 13px; font-weight: 400; color: var(--text2); margin-left: 3px; }
+  .metric-card.ok .metric-value { color: var(--ok); }
+  .metric-card.warn .metric-value { color: var(--warn); }
+  .metric-card.danger .metric-value { color: var(--danger); }
+
+  .diagram-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .diagram-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .diagram-title { font-size: 13px; font-weight: 600; }
+  .diagram-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .diagram-labels span { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  .road-canvas { display: flex; height: 100px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+  .lane-seg { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: flex 0.35s ease; overflow: hidden; min-width: 0; border-right: 1px solid rgba(0,0,0,0.3); }
+  .lane-seg:last-child { border-right: none; }
+  .lane-seg .seg-label { font-size: 8px; font-family: var(--mono); font-weight: 500; writing-mode: vertical-lr; text-orientation: mixed; transform: rotate(180deg); white-space: nowrap; max-height: 75%; overflow: hidden; opacity: 0.9; }
+  .lane-seg .seg-width { font-size: 9px; font-family: var(--mono); font-weight: 500; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .centerline-tick { position: absolute; top: 0; bottom: 0; width: 2px; left: 50%; background: repeating-linear-gradient(to bottom,#fbbf24 0,#fbbf24 6px,transparent 6px,transparent 12px); z-index: 5; pointer-events: none; }
+
+  .compare-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; overflow: hidden; }
+  .compare-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .compare-title { font-size: 13px; font-weight: 600; }
+  .compare-table-wrap { overflow-x: auto; }
+  table.compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .compare-table th { background: var(--bg3); padding: 8px 12px; text-align: left; font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; border-bottom: 1px solid var(--border); font-weight: 500; }
+  .compare-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; font-family: var(--mono); font-size: 12px; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .compare-table .total-row td { font-weight: 600; background: var(--bg3); }
+  .compare-table .active-col { color: var(--accent) !important; }
+  .compare-table .active-col-head { color: var(--accent) !important; border-bottom: 2px solid var(--accent) !important; }
+
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 500; font-family: var(--mono); }
+  .tag-gp  { background: rgba(22,101,52,0.4);  color: #86efac; }
+  .tag-exp { background: rgba(124,45,18,0.4);  color: #fdba74; }
+  .tag-dc  { background: rgba(30,27,75,0.5);   color: #a5b4fc; }
+  .tag-mse { background: rgba(59,7,100,0.5);   color: #d8b4fe; }
+  .tag-buf { background: rgba(28,34,51,0.6);   color: #94a3b8; }
+  .tag-ctr { background: rgba(66,32,6,0.5);    color: #fde68a; }
+
+  /* RIGHT PANEL */
+  .panel { background: var(--bg2); border-left: 1px solid var(--border); padding: 1.5rem 1rem; overflow-y: auto; }
+  .panel-section { margin-bottom: 1.75rem; }
+  .panel-label { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .constraint-item { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: var(--radius); margin-bottom: 6px; font-size: 12px; line-height: 1.5; border: 1px solid transparent; }
+  .constraint-item.ok     { background: var(--ok-dim);     border-color: rgba(34,197,94,0.2);   color: #86efac; }
+  .constraint-item.warn   { background: var(--warn-dim);   border-color: rgba(245,158,11,0.2);  color: #fcd34d; }
+  .constraint-item.danger { background: var(--danger-dim); border-color: rgba(239,68,68,0.2);   color: #fca5a5; }
+  .ci-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .ci-dot.ok { background: var(--ok); } .ci-dot.warn { background: var(--warn); } .ci-dot.danger { background: var(--danger); }
+  .breakdown-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-radius: 5px; margin-bottom: 2px; }
+  .breakdown-item:hover { background: var(--bg3); }
+  .bi-name { font-size: 12px; color: var(--text2); }
+  .bi-width { font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .breakdown-total { display: flex; justify-content: space-between; align-items: center; padding: 8px 8px; margin-top: 6px; border-top: 1px solid var(--border2); font-weight: 600; }
+  .bt-label { font-size: 12px; } .bt-val { font-family: var(--mono); font-size: 14px; color: var(--accent); }
+  .notes-area { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--sans); font-size: 12px; padding: 10px; resize: vertical; min-height: 80px; outline: none; line-height: 1.6; }
+  .notes-area:focus { border-color: var(--accent-border); }
+  .notes-area::placeholder { color: var(--text3); }
+
+  /* MODALS */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 1.5rem; width: 460px; max-width: 92vw; }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 1.25rem; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+  .modal-field { margin-bottom: 1rem; }
+  .modal-field label { display: block; font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .modal-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 8px 12px; outline: none; }
+  .modal-input:focus { border-color: var(--accent-border); }
+  .modal-input::placeholder { color: var(--text3); }
+  .field-hint { font-size: 10px; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
+  .confirm-name { color: var(--text); font-weight: 600; }
+
+  @media print {
+    header, .sidebar, .panel, .header-actions, .modal-overlay { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    body { background: white; color: black; }
+    .main { padding: 0; }
+    .metric-card, .diagram-wrap, .compare-wrap { border: 1px solid #ccc; break-inside: avoid; }
+    .metric-value { color: #1e40af !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-logo">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div>
+      <div class="header-title">Typical Section Analyzer</div>
+      <div class="header-sub">SR 84 — Roadway Cross-Section Tool</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="openExportModal()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+    <button class="btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">
+        <span>Configurations</span>
+        <button class="sidebar-label-btn" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New
+        </button>
+      </div>
+      <div id="configList"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label"><span>Adjust Widths</span></div>
+      <div id="sliders"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="metrics-row" id="metrics"></div>
+
+    <div class="diagram-wrap">
+      <div class="diagram-header">
+        <div class="diagram-title">Cross-Section Diagram</div>
+        <span id="activeName" style="font-size:11px;color:var(--text3);font-family:var(--mono);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      </div>
+      <div class="diagram-labels">
+        <span>← Southbound</span><span>Centerline</span><span>Northbound →</span>
+      </div>
+      <div class="road-canvas" id="roadCanvas">
+        <div class="centerline-tick"></div>
+      </div>
+      <div id="legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+    </div>
+
+    <div class="compare-wrap">
+      <div class="compare-header">
+        <div class="compare-title">All Configurations — Comparison</div>
+        <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Active highlighted in blue</span>
+      </div>
+      <div class="compare-table-wrap">
+        <table class="compare-table" id="compareTable"></table>
+      </div>
+    </div>
+  </main>
+
+  <aside class="panel">
+    <div class="panel-section">
+      <div class="panel-label">Constraint Checks</div>
+      <div id="constraints"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">Section Breakdown</div>
+      <div id="breakdown"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">Engineer Notes</div>
+      <textarea class="notes-area" id="notesArea" placeholder="Add design notes, comments, or assumptions…"></textarea>
+    </div>
+  </aside>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">New Configuration</div>
+    <div class="modal-sub">Name your configuration and optionally duplicate an existing one as the starting point.</div>
+    <div class="modal-field">
+      <label>Configuration Name</label>
+      <input class="modal-input" id="newConfigName" placeholder="e.g. Alt A — Managed Lane Option" maxlength="60"
+        onkeydown="if(event.key==='Enter')confirmAdd()">
+    </div>
+    <div class="modal-field">
+      <label>Starting Point</label>
+      <select class="modal-input" id="newConfigBase"></select>
+      <div class="field-hint">All widths can be edited with sliders after creation.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAdd()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">Delete Configuration</div>
+    <div class="modal-sub">Delete <span class="confirm-name" id="deleteConfigName"></span>? This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-title">Export</div>
+    <div class="modal-sub">Download all configurations or the currently active one.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn" onclick="exportJSON()">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Download all configs as JSON
+      </button>
+      <button class="btn" onclick="exportCSV()">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Download active config as CSV
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeExportModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LANE_META = [
+  { key:'sb_shldr',        label:'SB Shldr Out',    short:'SHLDR',  color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'sb_gp1',          label:'SB GP Lane 1',    short:'GP SB1', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'sb_gp2',          label:'SB GP Lane 2',    short:'GP SB2', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'sb_gp3',          label:'SB GP Lane 3',    short:'GP SB3', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'sb_buf',          label:'SB Buffer',       short:'BUF',    color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'sb_exp1',         label:'SB Exp Lane 1',   short:'EXP1',   color:'#7c2d12', text:'#fdba74', type:'exp' },
+  { key:'sb_exp2',         label:'SB Exp Lane 2',   short:'EXP2',   color:'#7c2d12', text:'#fdba74', type:'exp' },
+  { key:'sb_shldr_exp',    label:'SB Shldr Exp',    short:'SH EXP', color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'mse_sb',          label:'MSE Wall SB',     short:'MSE',    color:'#3b0764', text:'#d8b4fe', type:'mse' },
+  { key:'dc_shldr_exp_sb', label:'DC Shldr Exp SB', short:'DCSH',   color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'dc_sb',           label:'DC Lane SB',      short:'DC SB',  color:'#1e1b4b', text:'#a5b4fc', type:'dc'  },
+  { key:'shldr_in_sb',     label:'Shldr In SB',     short:'SH IN',  color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'cl',              label:'Centerline',      short:'℄',      color:'#422006', text:'#fde68a', type:'ctr' },
+  { key:'shldr_in_nb',     label:'Shldr In NB',     short:'SH IN',  color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'dc_nb',           label:'DC Lane NB',      short:'DC NB',  color:'#1e1b4b', text:'#a5b4fc', type:'dc'  },
+  { key:'dc_shldr_exp_nb', label:'DC Shldr Exp NB', short:'DCSH',   color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'mse_nb',          label:'MSE Wall NB',     short:'MSE',    color:'#3b0764', text:'#d8b4fe', type:'mse' },
+  { key:'nb_shldr_exp',    label:'NB Shldr Exp',    short:'SH EXP', color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'nb_exp1',         label:'NB Exp Lane 1',   short:'EXP1',   color:'#7c2d12', text:'#fdba74', type:'exp' },
+  { key:'nb_exp2',         label:'NB Exp Lane 2',   short:'EXP2',   color:'#7c2d12', text:'#fdba74', type:'exp' },
+  { key:'nb_buf',          label:'NB Buffer',       short:'BUF',    color:'#1c2535', text:'#94a3b8', type:'buf' },
+  { key:'nb_gp1',          label:'NB GP Lane 1',    short:'GP NB1', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'nb_gp2',          label:'NB GP Lane 2',    short:'GP NB2', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'nb_gp3',          label:'NB GP Lane 3',    short:'GP NB3', color:'#14532d', text:'#86efac', type:'gp'  },
+  { key:'nb_shldr',        label:'NB Shldr Out',    short:'SHLDR',  color:'#1c2535', text:'#94a3b8', type:'buf' },
+];
+
+const SLIDERS = [
+  { key:'sb_shldr', label:'SB Shoulder',      min:0, max:14, affects:[] },
+  { key:'nb_shldr', label:'NB Shoulder',       min:0, max:14, affects:[] },
+  { key:'sb_gp1',   label:'GP Lane W (SB)',    min:0, max:14, affects:['sb_gp2','sb_gp3'] },
+  { key:'nb_gp1',   label:'GP Lane W (NB)',    min:0, max:14, affects:['nb_gp2','nb_gp3'] },
+  { key:'sb_exp1',  label:'Exp Lane W (SB)',   min:0, max:14, affects:['sb_exp2'] },
+  { key:'nb_exp1',  label:'Exp Lane W (NB)',   min:0, max:14, affects:['nb_exp2'] },
+  { key:'dc_sb',    label:'DC Lane (SB)',       min:0, max:18, affects:[] },
+  { key:'dc_nb',    label:'DC Lane (NB)',       min:0, max:18, affects:[] },
+  { key:'cl',       label:'Centerline Width',  min:0, max:12, affects:[] },
+];
+
+const MSE_LIMIT = 155, COL_LIMIT = 177;
+const blankLanes = () => Object.fromEntries(LANE_META.map(m=>[m.key,0]));
+
+let configs = [
+  { id:'rfp',     label:'RFP (Full Config)',            custom:false, lanes:{ sb_shldr:8,  sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:11, sb_exp2:11, sb_shldr_exp:4, mse_sb:2, dc_shldr_exp_sb:4, dc_sb:15, shldr_in_sb:3, cl:7, shldr_in_nb:3, dc_nb:15, dc_shldr_exp_nb:4, mse_nb:2, nb_shldr_exp:4, nb_exp1:11, nb_exp2:11, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:8  }},
+  { id:'drop1',   label:'Drop 1 Exp Lane Between DCs', custom:false, lanes:{ sb_shldr:8,  sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:11, sb_exp2:0,  sb_shldr_exp:4, mse_sb:2, dc_shldr_exp_sb:4, dc_sb:15, shldr_in_sb:3, cl:7, shldr_in_nb:3, dc_nb:15, dc_shldr_exp_nb:4, mse_nb:2, nb_shldr_exp:4, nb_exp1:0,  nb_exp2:11, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:8  }},
+  { id:'merge1',  label:'Merge 1 DC Before SR 84',     custom:false, lanes:{ sb_shldr:8,  sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:11, sb_exp2:11, sb_shldr_exp:0, mse_sb:0, dc_shldr_exp_sb:0, dc_sb:0,  shldr_in_sb:4, cl:7, shldr_in_nb:3, dc_nb:15, dc_shldr_exp_nb:4, mse_nb:2, nb_shldr_exp:4, nb_exp1:0,  nb_exp2:11, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:8  }},
+  { id:'dcmerge', label:'DCs Merge Before SR 84',      custom:false, lanes:{ sb_shldr:8,  sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:11, sb_exp2:11, sb_shldr_exp:4, mse_sb:0, dc_shldr_exp_sb:0, dc_sb:0,  shldr_in_sb:0, cl:2, shldr_in_nb:0, dc_nb:0,  dc_shldr_exp_nb:0, mse_nb:0, nb_shldr_exp:4, nb_exp1:11, nb_exp2:11, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:8  }},
+  { id:'dc1exp',  label:'DCs Merge + 1 Exp Lane',      custom:false, lanes:{ sb_shldr:10, sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:12, sb_exp2:11, sb_shldr_exp:4, mse_sb:0, dc_shldr_exp_sb:0, dc_sb:0,  shldr_in_sb:0, cl:2, shldr_in_nb:0, dc_nb:0,  dc_shldr_exp_nb:0, mse_nb:0, nb_shldr_exp:3, nb_exp1:11, nb_exp2:12, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:10 }},
+  { id:'dc2exp',  label:'DCs Merge + 2 Exp Lanes',     custom:false, lanes:{ sb_shldr:10, sb_gp1:12, sb_gp2:12, sb_gp3:12, sb_buf:2, sb_exp1:12, sb_exp2:12, sb_shldr_exp:4, mse_sb:0, dc_shldr_exp_sb:0, dc_sb:0,  shldr_in_sb:0, cl:2, shldr_in_nb:0, dc_nb:0,  dc_shldr_exp_nb:0, mse_nb:0, nb_shldr_exp:4, nb_exp1:12, nb_exp2:12, nb_buf:2, nb_gp1:12, nb_gp2:12, nb_gp3:12, nb_shldr:10 }},
+];
+
+let activeId = 'rfp';
+let pendingDeleteId = null;
+let renamingId = null;
+
+const totalW = l => Object.values(l).reduce((s,v)=>s+(+v||0),0);
+const sumKeys = (l,ks) => ks.reduce((s,k)=>s+(+l[k]||0),0);
+const activeCfg = () => configs.find(c=>c.id===activeId);
+const uid = () => 'cfg_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,5);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const ea  = s => esc(s).replace(/"/g,'&quot;');
+
+function render() {
+  renderConfigList();
+  renderSliders();
+  renderMetrics();
+  renderDiagram();
+  renderLegend();
+  renderConstraints();
+  renderBreakdown();
+  renderCompareTable();
+}
+
+// ── CONFIG LIST ───────────────────────────────────────────────────────────────
+function renderConfigList() {
+  document.getElementById('configList').innerHTML = configs.map(cfg => {
+    const w = totalW(cfg.lanes);
+    const isActive = cfg.id === activeId;
+    const isRenaming = cfg.id === renamingId;
+    return `
+    <div class="config-item${isActive?' active':''}${cfg.custom?' is-custom':''}" id="ci_${cfg.id}">
+      <button class="config-main" onclick="selectConfig('${cfg.id}')">
+        ${isRenaming
+          ? `<input class="config-name-input" id="ri_${cfg.id}" value="${ea(cfg.label)}" maxlength="60"
+               onclick="event.stopPropagation()"
+               onblur="finishRename('${cfg.id}',this.value)"
+               onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelRename('${cfg.id}')">`
+          : `<span class="config-name" title="${ea(cfg.label)}">${esc(cfg.label)}</span>`
+        }
+        <span class="config-w">${w}'</span>
+      </button>
+      <div class="config-actions">
+        <button class="config-action-btn rename" title="Rename" onclick="event.stopPropagation();startRename('${cfg.id}')">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="config-action-btn delete" title="Delete" onclick="event.stopPropagation();openDeleteModal('${cfg.id}')">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if(renamingId) {
+    const inp = document.getElementById('ri_'+renamingId);
+    if(inp){ inp.focus(); inp.select(); }
+  }
+  const ac = activeCfg();
+  document.getElementById('activeName').textContent = ac ? ac.label : '';
+}
+
+// ── RENAME ────────────────────────────────────────────────────────────────────
+function startRename(id) { renamingId = id; renderConfigList(); }
+function cancelRename(id) { renamingId = null; renderConfigList(); }
+function finishRename(id, val) {
+  const cfg = configs.find(c=>c.id===id);
+  if(cfg && val.trim()) cfg.label = val.trim();
+  renamingId = null;
+  render();
+}
+
+// ── SELECT ────────────────────────────────────────────────────────────────────
+function selectConfig(id) {
+  if(renamingId === id) return;
+  activeId = id;
+  render();
+}
+
+// ── ADD ───────────────────────────────────────────────────────────────────────
+function openAddModal() {
+  const sel = document.getElementById('newConfigBase');
+  sel.innerHTML = '<option value="__blank__">Blank (all zeros)</option>' +
+    configs.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${ea(c.label)}</option>`).join('');
+  document.getElementById('newConfigName').value = '';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(()=>document.getElementById('newConfigName').focus(), 60);
+}
+function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+function confirmAdd() {
+  const name = document.getElementById('newConfigName').value.trim();
+  if(!name) { document.getElementById('newConfigName').focus(); return; }
+  const baseId = document.getElementById('newConfigBase').value;
+  const base = configs.find(c=>c.id===baseId);
+  const newLanes = base ? JSON.parse(JSON.stringify(base.lanes)) : blankLanes();
+  const newId = uid();
+  configs.push({ id:newId, label:name, custom:true, lanes:newLanes });
+  activeId = newId;
+  closeAddModal();
+  render();
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+function openDeleteModal(id) {
+  if(configs.length <= 1) { alert('You must keep at least one configuration.'); return; }
+  pendingDeleteId = id;
+  const cfg = configs.find(c=>c.id===id);
+  document.getElementById('deleteConfigName').textContent = cfg ? cfg.label : '';
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() { pendingDeleteId=null; document.getElementById('deleteModal').classList.remove('open'); }
+function confirmDelete() {
+  if(!pendingDeleteId) return;
+  const idx = configs.findIndex(c=>c.id===pendingDeleteId);
+  if(idx > -1) {
+    configs.splice(idx,1);
+    if(activeId===pendingDeleteId)
+      activeId = configs[Math.max(0,idx-1)]?.id || configs[0]?.id;
+  }
+  pendingDeleteId = null;
+  document.getElementById('deleteModal').classList.remove('open');
+  render();
+}
+
+// ── SLIDERS ───────────────────────────────────────────────────────────────────
+function renderSliders() {
+  const cfg = activeCfg(); if(!cfg) return;
+  document.getElementById('sliders').innerHTML = SLIDERS.map(s=>{
+    const v = cfg.lanes[s.key]||0;
+    return `<div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-name">${s.label}</span>
+        <span class="slider-val" id="sv_${s.key}">${v}'</span>
+      </div>
+      <input type="range" min="${s.min}" max="${s.max}" step="1" value="${v}"
+        oninput="handleSlider('${s.key}',+this.value,${JSON.stringify(s.affects||[])})">
+    </div>`;
+  }).join('');
+}
+
+function handleSlider(key, v, affects) {
+  const cfg = activeCfg(); if(!cfg) return;
+  cfg.lanes[key] = v;
+  affects.forEach(k=>{ if((cfg.lanes[k]||0)>0) cfg.lanes[k]=v; });
+  const el=document.getElementById('sv_'+key); if(el) el.textContent=v+"'";
+  renderConfigList(); renderMetrics(); renderDiagram(); renderConstraints(); renderBreakdown(); renderCompareTable();
+}
+
+// ── METRICS ───────────────────────────────────────────────────────────────────
+function renderMetrics() {
+  const cfg=activeCfg(); if(!cfg) return;
+  const l=cfg.lanes, t=totalW(l);
+  const gpW=sumKeys(l,['sb_gp1','sb_gp2','sb_gp3','nb_gp1','nb_gp2','nb_gp3']);
+  const expW=sumKeys(l,['sb_exp1','sb_exp2','nb_exp1','nb_exp2']);
+  const dcW=sumKeys(l,['dc_sb','dc_nb']);
+  const cls=t>COL_LIMIT?'danger':t>MSE_LIMIT?'warn':'ok';
+  document.getElementById('metrics').innerHTML=`
+    <div class="metric-card ${cls}"><div class="metric-label">TOTAL WIDTH</div><div class="metric-value">${t}<span class="metric-unit">ft</span></div></div>
+    <div class="metric-card"><div class="metric-label">GP LANES</div><div class="metric-value">${gpW}<span class="metric-unit">ft</span></div></div>
+    <div class="metric-card"><div class="metric-label">EXPRESS</div><div class="metric-value">${expW}<span class="metric-unit">ft</span></div></div>
+    <div class="metric-card"><div class="metric-label">DC / MSE</div><div class="metric-value">${dcW}<span class="metric-unit">ft</span></div></div>`;
+}
+
+// ── DIAGRAM ───────────────────────────────────────────────────────────────────
+function renderDiagram() {
+  const cfg=activeCfg(); if(!cfg) return;
+  const canvas=document.getElementById('roadCanvas');
+  Array.from(canvas.querySelectorAll('.lane-seg')).forEach(e=>e.remove());
+  LANE_META.filter(m=>(cfg.lanes[m.key]||0)>0).forEach(m=>{
+    const w=cfg.lanes[m.key]||0;
+    const seg=document.createElement('div'); seg.className='lane-seg';
+    seg.style.cssText=`flex:${w};background:${m.color};`;
+    const lbl=document.createElement('span'); lbl.className='seg-label'; lbl.style.color=m.text; lbl.textContent=m.short;
+    const wl=document.createElement('span');  wl.className='seg-width';  wl.style.color=m.text; wl.textContent=w+"'";
+    seg.appendChild(lbl); seg.appendChild(wl); canvas.appendChild(seg);
+  });
+}
+
+function renderLegend() {
+  document.getElementById('legend').innerHTML=[
+    {type:'gp',label:'General Purpose',cls:'tag-gp'},{type:'exp',label:'Express Lane',cls:'tag-exp'},
+    {type:'dc',label:'DC (Distributor)',cls:'tag-dc'},{type:'mse',label:'MSE Wall',cls:'tag-mse'},
+    {type:'buf',label:'Shoulder / Buffer',cls:'tag-buf'},{type:'ctr',label:'Centerline',cls:'tag-ctr'},
+  ].map(t=>`<span class="tag ${t.cls}">${t.label}</span>`).join('');
+}
+
+// ── CONSTRAINTS ───────────────────────────────────────────────────────────────
+function renderConstraints() {
+  const cfg=activeCfg(); if(!cfg) return;
+  const l=cfg.lanes, t=totalW(l), items=[];
+  if((l.mse_sb||0)+(l.mse_nb||0)>0){
+    const ok=t<=MSE_LIMIT;
+    items.push({cls:ok?'ok':'danger',text:`MSE wall width: ${t} ft — limit 155 ft${ok?'':` (over by ${t-MSE_LIMIT} ft)`}`});
+  }
+  const cOk=t<=COL_LIMIT;
+  items.push({cls:cOk?'ok':'danger',text:`Column width: ${t} ft — limit 177 ft${cOk?'':` (over by ${t-COL_LIMIT} ft)`}`});
+  const gp=l.sb_gp1||0; if(gp>0) items.push({cls:(gp>=11&&gp<=12)?'ok':'warn',text:`GP lane: ${gp} ft — std 11–12 ft`});
+  const ex=l.sb_exp1||0; if(ex>0) items.push({cls:(ex>=11&&ex<=12)?'ok':'warn',text:`Express lane: ${ex} ft — std 11–12 ft`});
+  const dc=l.dc_sb||0;   if(dc>0) items.push({cls:(dc>=14&&dc<=16)?'ok':'warn',text:`DC lane: ${dc} ft — std 14–16 ft`});
+  document.getElementById('constraints').innerHTML=items.map(i=>
+    `<div class="constraint-item ${i.cls}"><div class="ci-dot ${i.cls}"></div><span>${i.text}</span></div>`
+  ).join('');
+}
+
+// ── BREAKDOWN ─────────────────────────────────────────────────────────────────
+function renderBreakdown() {
+  const cfg=activeCfg(); if(!cfg) return;
+  const rows=LANE_META.filter(m=>(cfg.lanes[m.key]||0)>0);
+  const t=totalW(cfg.lanes);
+  document.getElementById('breakdown').innerHTML=
+    rows.map(m=>`<div class="breakdown-item"><span class="bi-name">${m.label}</span><span class="bi-width">${cfg.lanes[m.key]}'</span></div>`).join('')+
+    `<div class="breakdown-total"><span class="bt-label">Total</span><span class="bt-val">${t} ft</span></div>`;
+}
+
+// ── COMPARE TABLE ─────────────────────────────────────────────────────────────
+function renderCompareTable() {
+  const ai=configs.findIndex(c=>c.id===activeId);
+  const tagMap={gp:'tag-gp',exp:'tag-exp',dc:'tag-dc',mse:'tag-mse',buf:'tag-buf',ctr:'tag-ctr'};
+  let html='<thead><tr><th>Element</th><th>Type</th>';
+  configs.forEach((c,i)=>{
+    const short=c.label.length>18?c.label.slice(0,17)+'…':c.label;
+    html+=`<th class="${i===ai?'active-col-head':''}" title="${ea(c.label)}">${esc(short)}</th>`;
+  });
+  html+='</tr></thead><tbody>';
+  LANE_META.forEach(m=>{
+    const vals=configs.map(c=>c.lanes[m.key]||0);
+    if(vals.every(v=>v===0)) return;
+    html+=`<tr><td>${m.label}</td><td><span class="tag ${tagMap[m.type]||'tag-buf'}">${m.type.toUpperCase()}</span></td>`;
+    vals.forEach((v,i)=>{ html+=`<td class="${i===ai?'active-col':''}">${v>0?v+"'":'—'}</td>`; });
+    html+='</tr>';
+  });
+  html+='<tr class="total-row"><td>Total Width</td><td></td>';
+  configs.forEach((c,i)=>{ html+=`<td class="${i===ai?'active-col':''}">${totalW(c.lanes)}'</td>`; });
+  html+='</tr></tbody>';
+  document.getElementById('compareTable').innerHTML=html;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function openExportModal()  { document.getElementById('exportModal').classList.add('open'); }
+function closeExportModal() { document.getElementById('exportModal').classList.remove('open'); }
+function exportJSON() {
+  const data={ generated:new Date().toISOString(), configs:configs.map(c=>({id:c.id,label:c.label,custom:c.custom,total_ft:totalW(c.lanes),lanes:c.lanes})), notes:document.getElementById('notesArea').value };
+  dl('section_configs.json', JSON.stringify(data,null,2), 'application/json');
+}
+function exportCSV() {
+  const cfg=activeCfg(); if(!cfg) return;
+  const rows=[['Configuration',cfg.label],['Total Width (ft)',totalW(cfg.lanes)],[''],['Element','Type','Width (ft)']];
+  LANE_META.filter(m=>(cfg.lanes[m.key]||0)>0).forEach(m=>rows.push([m.label,m.type,cfg.lanes[m.key]]));
+  rows.push(['TOTAL','',totalW(cfg.lanes)]);
+  dl('section_config.csv', rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'), 'text/csv');
+}
+function dl(name, content, type) {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type}));
+  a.download=name; a.click();
+  closeExportModal();
+}
+
+render();
+</script>
+</body>
+</html>
