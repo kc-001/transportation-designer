@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Event Tracker — TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:        #0f2340;
+  --navy-mid:    #1a3557;
+  --navy-light:  #234570;
+  --blue:        #1B6AC9;
+  --blue-light:  #3B8FE8;
+  --blue-dim:    rgba(27,106,201,0.10);
+  --blue-border: rgba(27,106,201,0.25);
+  --sand:        #F5F2ED;
+  --sand2:       #EDE9E2;
+  --sand3:       #DDD8CF;
+  --text:        #0f2340;
+  --text2:       #3D5470;
+  --text3:       #7A90A8;
+  --white:       #FFFFFF;
+  --ok:          #0D7A4E;
+  --ok-dim:      rgba(13,122,78,0.10);
+  --ok-border:   rgba(13,122,78,0.25);
+  --warn:        #C47D0A;
+  --warn-dim:    rgba(196,125,10,0.10);
+  --warn-border: rgba(196,125,10,0.25);
+  --danger:      #B91C1C;
+  --danger-dim:  rgba(185,28,28,0.10);
+  --danger-border:rgba(185,28,28,0.25);
+  --purple:      #6D28D9;
+  --purple-dim:  rgba(109,40,217,0.10);
+  --purple-border:rgba(109,40,217,0.25);
+  --radius:      8px;
+  --radius-lg:   14px;
+  --serif:       'DM Serif Display', Georgia, serif;
+  --sans:        'DM Sans', system-ui, sans-serif;
+  --shadow-sm:   0 1px 3px rgba(15,35,64,0.08);
+  --shadow-md:   0 4px 16px rgba(15,35,64,0.10);
+  --shadow-lg:   0 12px 40px rgba(15,35,64,0.13);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--sand); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* ── NAV ── */
+nav {
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--sand3); padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0; z-index: 200;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 30px; height: 30px; background: var(--navy); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+.nav-logo svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; }
+.nav-wordmark { font-family: var(--serif); font-size: 15px; color: var(--navy); }
+.nav-wordmark span { color: var(--blue); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-project-name {
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  background: var(--sand); border: 1px solid var(--sand3);
+  padding: 4px 12px; border-radius: 20px; font-family: var(--sans);
+  cursor: pointer; border: 1px solid var(--sand3); outline: none;
+  max-width: 260px; min-width: 180px;
+}
+.nav-project-name:focus { border-color: var(--blue-border); background: white; }
+
+.btn {
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  padding: 6px 14px; border-radius: var(--radius); border: 1px solid var(--sand3);
+  background: white; color: var(--text2); cursor: pointer;
+  transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { background: var(--sand); border-color: var(--sand3); color: var(--text); }
+.btn-primary { background: var(--navy); border-color: transparent; color: white; }
+.btn-primary:hover { background: var(--navy-light); }
+.btn-danger { background: var(--danger-dim); border-color: var(--danger-border); color: var(--danger); }
+.btn-danger:hover { background: rgba(185,28,28,0.18); }
+.btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: var(--navy); padding: 2rem 2rem 1.75rem;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.page-header-left h1 { font-family: var(--serif); font-size: 1.75rem; color: white; letter-spacing: -0.02em; line-height: 1.2; }
+.page-header-left p { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.page-header-right { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-header { font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 7px 16px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn-header:hover { background: rgba(255,255,255,0.15); }
+.btn-header svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+.btn-header-primary { background: var(--blue); border-color: transparent; color: white; }
+.btn-header-primary:hover { background: var(--blue-light); }
+
+/* ── MAIN LAYOUT ── */
+.main { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 4rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* ── CARDS ── */
+.card { background: white; border: 1px solid var(--sand3); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.card-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--sand2); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.card-title-wrap { display: flex; align-items: center; gap: 10px; }
+.card-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.card-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 1.8; }
+.card-title { font-family: var(--serif); font-size: 1.05rem; color: var(--navy); }
+.card-count { font-size: 11px; font-weight: 500; color: var(--text3); background: var(--sand); padding: 2px 8px; border-radius: 10px; font-family: var(--sans); }
+.card-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ── TIMELINE ── */
+.timeline-card { background: white; border: 1px solid var(--sand3); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.timeline-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--sand2); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.timeline-body { padding: 1.5rem 1.25rem; overflow-x: auto; }
+.timeline-wrap { position: relative; min-height: 110px; min-width: 600px; }
+.timeline-axis { position: absolute; top: 54px; left: 0; right: 0; height: 2px; background: var(--sand2); border-radius: 1px; }
+.timeline-months { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.timeline-month { font-size: 10px; color: var(--text3); font-family: var(--sans); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.timeline-today { position: absolute; top: 20px; bottom: 0; width: 1px; background: var(--blue); opacity: 0.6; }
+.timeline-today::before { content: 'TODAY'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 8px; color: var(--blue); font-weight: 600; letter-spacing: 0.08em; white-space: nowrap; }
+.milestone-dot {
+  position: absolute; top: 46px; transform: translateX(-50%);
+  width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid white;
+  box-shadow: 0 0 0 2px currentColor, var(--shadow-sm);
+  cursor: pointer; transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+.milestone-dot:hover { transform: translateX(-50%) scale(1.25); }
+.milestone-label {
+  position: absolute; top: 70px; transform: translateX(-50%);
+  font-size: 9px; font-weight: 500; color: var(--text2); white-space: nowrap;
+  max-width: 90px; overflow: hidden; text-overflow: ellipsis; text-align: center;
+  font-family: var(--sans);
+}
+.milestone-date-label {
+  position: absolute; top: 82px; transform: translateX(-50%);
+  font-size: 8px; color: var(--text3); white-space: nowrap; font-family: var(--sans);
+}
+.timeline-empty { display: flex; align-items: center; justify-content: center; height: 80px; color: var(--text3); font-size: 13px; }
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  background: var(--sand); padding: 9px 12px; text-align: left;
+  font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.07em; border-bottom: 1px solid var(--sand3); white-space: nowrap;
+  font-family: var(--sans);
+}
+tbody td { padding: 9px 12px; border-bottom: 1px solid var(--sand2); color: var(--text); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--sand); }
+tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center; padding: 2rem; }
+.td-actions { display: flex; gap: 4px; justify-content: flex-end; }
+.row-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 5px; color: var(--text3); transition: all 0.12s; display: flex; align-items: center; }
+.row-btn:hover { background: var(--sand2); color: var(--text); }
+.row-btn.del:hover { background: var(--danger-dim); color: var(--danger); }
+.row-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* EDITABLE CELLS */
+.editable { outline: none; min-width: 60px; }
+.editable:focus { background: #EEF4FF; border-radius: 4px; outline: 2px solid var(--blue-border); padding: 1px 4px; }
+[contenteditable]:empty:before { content: attr(data-ph); color: var(--text3); pointer-events: none; }
+
+/* STATUS BADGES */
+.badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; cursor: pointer; font-family: var(--sans); transition: opacity 0.15s; }
+.badge:hover { opacity: 0.8; }
+.badge-blue     { background: var(--blue-dim);    color: var(--blue);    border: 1px solid var(--blue-border); }
+.badge-green    { background: var(--ok-dim);      color: var(--ok);      border: 1px solid var(--ok-border); }
+.badge-yellow   { background: var(--warn-dim);    color: var(--warn);    border: 1px solid var(--warn-border); }
+.badge-red      { background: var(--danger-dim);  color: var(--danger);  border: 1px solid var(--danger-border); }
+.badge-purple   { background: var(--purple-dim);  color: var(--purple);  border: 1px solid var(--purple-border); }
+.badge-gray     { background: var(--sand);        color: var(--text3);   border: 1px solid var(--sand3); }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.filter-btn { font-family: var(--sans); font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--sand3); background: white; color: var(--text3); cursor: pointer; transition: all 0.12s; }
+.filter-btn:hover, .filter-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,35,64,0.5); z-index: 300; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 560px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--sand2); display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-family: var(--serif); font-size: 1.15rem; color: var(--navy); }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--text3); padding: 4px; border-radius: 5px; display: flex; }
+.modal-close:hover { background: var(--sand); color: var(--text); }
+.modal-close svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+.modal-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--sand2); display: flex; justify-content: flex-end; gap: 8px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
+.form-input, .form-select, .form-textarea {
+  font-family: var(--sans); font-size: 13px; color: var(--text);
+  background: white; border: 1px solid var(--sand3); border-radius: var(--radius);
+  padding: 8px 11px; outline: none; transition: border-color 0.15s; width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--blue-border); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+.form-textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+/* SUMMARY STRIP */
+.summary-strip { display: flex; gap: 12px; flex-wrap: wrap; }
+.sum-card { background: white; border: 1px solid var(--sand3); border-radius: var(--radius); padding: 10px 16px; display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+.sum-num { font-family: var(--serif); font-size: 1.6rem; color: var(--navy); line-height: 1; }
+.sum-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+.sum-card.ok .sum-num { color: var(--ok); }
+.sum-card.warn .sum-num { color: var(--warn); }
+.sum-card.danger .sum-num { color: var(--danger); }
+
+/* SCOPE IMPACT */
+.impact-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.impact-pos { background: var(--ok-dim); color: var(--ok); }
+.impact-neg { background: var(--danger-dim); color: var(--danger); }
+.impact-neu { background: var(--sand); color: var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="nav-wordmark">Transportation<span>Designer</span></div>
+  </a>
+  <div class="nav-right">
+    <input class="nav-project-name" id="projectName" type="text" value="Project Name / Financial ID" title="Click to edit project name">
+    <button class="btn" onclick="saveData()">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
+    </button>
+    <button class="btn" onclick="loadData()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Load
+    </button>
+    <button class="btn btn-primary" onclick="exportAll()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export JSON
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Project Event Tracker</h1>
+    <p id="headerSub">Meetings · Submittals · Coordination · Scope</p>
+  </div>
+  <div class="page-header-right">
+    <div class="summary-strip" id="summaryStrip"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TIMELINE -->
+  <div class="timeline-card">
+    <div class="timeline-header">
+      <div class="card-title-wrap">
+        <div class="card-icon" style="background:var(--navy);">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <span class="card-title">Project Timeline</span>
+        <span class="card-count" id="milestoneCount">0 milestones</span>
+      </div>
+      <div class="card-actions">
+        <div style="display:flex;gap:6px;align-items:center;">
+          <label style="font-size:11px;color:var(--text3);">From</label>
+          <input type="date" class="form-input" id="tlStart" style="padding:4px 8px;font-size:12px;width:140px;">
+          <label style="font-size:11px;color:var(--text3);">To</label>
+          <input type="date" class="form-input" id="tlEnd" style="padding:4px 8px;font-size:12px;width:140px;">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('milestone')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Milestone
+        </button>
+      </div>
+    </div>
+    <div class="timeline-body">
+      <div class="timeline-wrap" id="timelineWrap">
+        <div class="timeline-empty" id="timelineEmpty">Set a date range and add milestones to build your timeline.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEETING TRACKER -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-icon" style="background:#1B6AC9;">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <span class="card-title">Meeting Tracker</span>
+        <span class="card-count" id="meetingCount">0 meetings</span>
+      </div>
+      <div class="card-actions">
+        <div class="filter-bar" id="meetingFilters">
+          <button class="filter-btn active" onclick="filterTable('meetings','all',this)">All</button>
+          <button class="filter-btn" onclick="filterTable('meetings','Kickoff',this)">Kickoff</button>
+          <button class="filter-btn" onclick="filterTable('meetings','Design',this)">Design</button>
+          <button class="filter-btn" onclick="filterTable('meetings','Agency',this)">Agency</button>
+          <button class="filter-btn" onclick="filterTable('meetings','QA/QC',this)">QA/QC</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('meeting')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Meeting
+        </button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="meetingTable">
+        <thead>
+          <tr>
+            <th>Date</th><th>Type</th><th>Attendees</th><th>Topics</th>
+            <th>Action Items</th><th>Owner</th><th>Due Date</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="meetingBody">
+          <tr class="empty-row"><td colspan="9">No meetings logged. Click "Add Meeting" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SUBMITTAL TRACKER -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-icon" style="background:#0D7A4E;">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <span class="card-title">Submittal Tracker</span>
+        <span class="card-count" id="submittalCount">0 submittals</span>
+      </div>
+      <div class="card-actions">
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterTable('submittals','all',this)">All</button>
+          <button class="filter-btn" onclick="filterTable('submittals','Approved',this)">Approved</button>
+          <button class="filter-btn" onclick="filterTable('submittals','Revise & Resubmit',this)">Revise</button>
+          <button class="filter-btn" onclick="filterTable('submittals','Rejected',this)">Rejected</button>
+          <button class="filter-btn" onclick="filterTable('submittals','Pending',this)">Pending</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('submittal')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Submittal
+        </button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="submittalTable">
+        <thead>
+          <tr>
+            <th>No.</th><th>Description</th><th>Spec Section</th><th>Date</th>
+            <th>% Complete</th><th>Comment Due</th><th>Response Due</th>
+            <th># Comments</th><th># Critical</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="submittalBody">
+          <tr class="empty-row"><td colspan="11">No submittals logged. Click "Add Submittal" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COORDINATION TRACKER -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-icon" style="background:#6D28D9;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <span class="card-title">Coordination Tracker</span>
+        <span class="card-count" id="coordCount">0 items</span>
+      </div>
+      <div class="card-actions">
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterTable('coordination','all',this)">All</button>
+          <button class="filter-btn" onclick="filterTable('coordination','Internal',this)">Internal</button>
+          <button class="filter-btn" onclick="filterTable('coordination','External',this)">External</button>
+          <button class="filter-btn" onclick="filterTable('coordination','Open',this)">Open</button>
+          <button class="filter-btn" onclick="filterTable('coordination','Closed',this)">Closed</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('coordination')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Item
+        </button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="coordTable">
+        <thead>
+          <tr>
+            <th>Date</th><th>Type</th><th>Agency / Party</th><th>Topic</th>
+            <th>Action Required</th><th>Owner</th><th>Due Date</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="coordBody">
+          <tr class="empty-row"><td colspan="9">No coordination items logged. Click "Add Item" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCOPE CHANGES -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-wrap">
+        <div class="card-icon" style="background:#C47D0A;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <span class="card-title">Scope Changes</span>
+        <span class="card-count" id="scopeCount">0 changes</span>
+      </div>
+      <div class="card-actions">
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterTable('scope','all',this)">All</button>
+          <button class="filter-btn" onclick="filterTable('scope','Potential',this)">Potential</button>
+          <button class="filter-btn" onclick="filterTable('scope','Realized',this)">Realized</button>
+          <button class="filter-btn" onclick="filterTable('scope','Rejected',this)">Rejected</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('scope')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Change
+        </button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="scopeTable">
+        <thead>
+          <tr>
+            <th>Date</th><th>Change Description</th><th>Initiated By</th>
+            <th>Cost Impact</th><th>Schedule Impact</th><th>Status</th><th>Notes</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="scopeBody">
+          <tr class="empty-row"><td colspan="8">No scope changes logged. Click "Add Change" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── MODALS ── -->
+
+<!-- MILESTONE MODAL -->
+<div class="modal-overlay" id="milestoneModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Milestone</div>
+      <button class="modal-close" onclick="closeModal('milestone')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group full">
+          <label class="form-label">Milestone Name</label>
+          <input class="form-input" id="ms-name" placeholder="e.g. 60% Plans Submittal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="ms-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="ms-category">
+            <option>Submittal</option>
+            <option>Meeting</option>
+            <option>Approval</option>
+            <option>Deadline</option>
+            <option>Milestone</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('milestone')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMilestone()">Add Milestone</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEETING MODAL -->
+<div class="modal-overlay" id="meetingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Meeting</div>
+      <button class="modal-close" onclick="closeModal('meeting')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="mt-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Meeting Type</label>
+          <select class="form-select" id="mt-type">
+            <option>Kickoff</option><option>Design</option><option>Agency</option>
+            <option>QA/QC</option><option>Utility</option><option>Public</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Attendees</label>
+          <input class="form-input" id="mt-attendees" placeholder="Names or roles, comma separated">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Topics</label>
+          <textarea class="form-textarea" id="mt-topics" placeholder="Meeting topics discussed"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Action Items</label>
+          <textarea class="form-textarea" id="mt-actions" placeholder="Action items arising from this meeting"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Owner</label>
+          <input class="form-input" id="mt-owner" placeholder="Responsible party">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input class="form-input" type="date" id="mt-due">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="mt-status">
+            <option>Open</option><option>In Progress</option><option>Complete</option><option>Overdue</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('meeting')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMeeting()">Add Meeting</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMITTAL MODAL -->
+<div class="modal-overlay" id="submittalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Submittal</div>
+      <button class="modal-close" onclick="closeModal('submittal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Submittal No.</label>
+          <input class="form-input" id="su-num" placeholder="e.g. 001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Spec Section</label>
+          <input class="form-input" id="su-spec" placeholder="e.g. 03 30 00">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Description</label>
+          <input class="form-input" id="su-desc" placeholder="Submittal description">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date Submitted</label>
+          <input class="form-input" type="date" id="su-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">% Complete</label>
+          <input class="form-input" type="number" id="su-pct" placeholder="0" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comment Due Date</label>
+          <input class="form-input" type="date" id="su-commentdue">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Response Due Date</label>
+          <input class="form-input" type="date" id="su-responsedue">
+        </div>
+        <div class="form-group">
+          <label class="form-label"># Comments</label>
+          <input class="form-input" type="number" id="su-comments" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label"># Critical Comments</label>
+          <input class="form-input" type="number" id="su-critical" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="su-status">
+            <option>Pending</option><option>Under Review</option><option>Approved</option>
+            <option>Approved as Noted</option><option>Revise & Resubmit</option><option>Rejected</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('submittal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addSubmittal()">Add Submittal</button>
+    </div>
+  </div>
+</div>
+
+<!-- COORDINATION MODAL -->
+<div class="modal-overlay" id="coordinationModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Coordination Item</div>
+      <button class="modal-close" onclick="closeModal('coordination')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="co-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="co-type">
+            <option>Internal</option><option>External</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Agency / Party</label>
+          <input class="form-input" id="co-party" placeholder="e.g. FDOT D6, Miami-Dade, FPL">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Topic</label>
+          <textarea class="form-textarea" id="co-topic" placeholder="What is being coordinated?"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Action Required</label>
+          <textarea class="form-textarea" id="co-action" placeholder="What needs to happen next?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Owner</label>
+          <input class="form-input" id="co-owner" placeholder="Responsible party">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input class="form-input" type="date" id="co-due">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="co-status">
+            <option>Open</option><option>In Progress</option><option>Closed</option><option>Blocked</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('coordination')">Cancel</button>
+      <button class="btn btn-primary" onclick="addCoordination()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCOPE MODAL -->
+<div class="modal-overlay" id="scopeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Scope Change</div>
+      <button class="modal-close" onclick="closeModal('scope')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="sc-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="sc-status">
+            <option>Potential</option><option>Realized</option><option>Rejected</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Change Description</label>
+          <textarea class="form-textarea" id="sc-desc" placeholder="Describe the scope change"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initiated By</label>
+          <input class="form-input" id="sc-by" placeholder="Person or agency">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cost Impact</label>
+          <select class="form-select" id="sc-cost">
+            <option>Unknown</option><option>Positive (Add)</option><option>Negative (Deduct)</option><option>Neutral</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Schedule Impact</label>
+          <select class="form-select" id="sc-schedule">
+            <option>Unknown</option><option>Add Time</option><option>No Impact</option><option>Reduce Time</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="sc-notes" placeholder="Additional context or references"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('scope')">Cancel</button>
+      <button class="btn btn-primary" onclick="addScope()">Add Change</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN FILE INPUT -->
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleLoad(event)">
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let data = {
+  project: 'Project Name / Financial ID',
+  milestones: [],
+  meetings: [],
+  submittals: [],
+  coordination: [],
+  scope: []
+};
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+const uid = () => '_' + Math.random().toString(36).slice(2,9);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const STATUS_COLORS = {
+  'Open':'badge-blue','In Progress':'badge-yellow','Complete':'badge-green','Closed':'badge-green',
+  'Overdue':'badge-red','Blocked':'badge-red','Approved':'badge-green','Approved as Noted':'badge-green',
+  'Revise & Resubmit':'badge-yellow','Rejected':'badge-red','Pending':'badge-gray',
+  'Under Review':'badge-blue','Potential':'badge-yellow','Realized':'badge-green',
+  'Internal':'badge-blue','External':'badge-purple'
+};
+const badge = (status, extra='') => `<span class="badge ${STATUS_COLORS[status]||'badge-gray'}" ${extra}>${esc(status)}</span>`;
+
+const CATEGORY_COLORS = {
+  'Submittal':'#0D7A4E','Meeting':'#1B6AC9','Approval':'#6D28D9',
+  'Deadline':'#B91C1C','Milestone':'#0f2340'
+};
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(type) {
+  document.getElementById(type+'Modal').classList.add('open');
+  // Set today as default date
+  const today = new Date().toISOString().split('T')[0];
+  const dateField = document.getElementById(
+    type==='milestone'?'ms-date':type==='meeting'?'mt-date':
+    type==='submittal'?'su-date':type==='coordination'?'co-date':'sc-date'
+  );
+  if(dateField && !dateField.value) dateField.value = today;
+}
+function closeModal(type) { document.getElementById(type+'Modal').classList.remove('open'); }
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+// ── MILESTONE ─────────────────────────────────────────────────────────────────
+function addMilestone() {
+  const name = document.getElementById('ms-name').value.trim();
+  const date = document.getElementById('ms-date').value;
+  const cat  = document.getElementById('ms-category').value;
+  if(!name || !date) { alert('Name and date are required.'); return; }
+  data.milestones.push({ id:uid(), name, date, category:cat });
+  data.milestones.sort((a,b)=>a.date.localeCompare(b.date));
+  closeModal('milestone');
+  document.getElementById('ms-name').value='';
+  document.getElementById('ms-date').value='';
+  renderTimeline(); renderSummary();
+}
+function deleteMilestone(id) {
+  data.milestones = data.milestones.filter(m=>m.id!==id);
+  renderTimeline(); renderSummary();
+}
+
+function renderTimeline() {
+  const wrap = document.getElementById('timelineWrap');
+  const empty = document.getElementById('timelineEmpty');
+  const startVal = document.getElementById('tlStart').value;
+  const endVal   = document.getElementById('tlEnd').value;
+  document.getElementById('milestoneCount').textContent = data.milestones.length + ' milestone' + (data.milestones.length!==1?'s':'');
+
+  // Clear old dots/labels
+  wrap.querySelectorAll('.milestone-dot,.milestone-label,.milestone-date-label,.timeline-axis,.timeline-today,.timeline-months-row').forEach(e=>e.remove());
+
+  if(!startVal || !endVal || data.milestones.length===0) {
+    empty.style.display='flex'; return;
+  }
+  empty.style.display='none';
+
+  const start = new Date(startVal+'T00:00:00');
+  const end   = new Date(endVal+'T00:00:00');
+  const span  = end - start;
+  if(span <= 0) return;
+
+  // Axis
+  const axis = document.createElement('div'); axis.className='timeline-axis';
+  wrap.appendChild(axis);
+
+  // Today marker
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(today >= start && today <= end) {
+    const pct = ((today-start)/span)*100;
+    const td = document.createElement('div');
+    td.className='timeline-today'; td.style.left=pct+'%';
+    wrap.appendChild(td);
+  }
+
+  // Month labels
+  const mrow = document.createElement('div');
+  mrow.className='timeline-months-row';
+  mrow.style.cssText='position:absolute;top:0;left:0;right:0;display:flex;';
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+  while(cur <= end) {
+    const pct = Math.max(0,Math.min(100,((cur-start)/span)*100));
+    const lbl = document.createElement('div');
+    lbl.style.cssText=`position:absolute;left:${pct}%;font-size:9px;color:var(--text3);font-family:var(--sans);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;transform:translateX(-50%);`;
+    lbl.textContent=months[cur.getMonth()]+' '+(cur.getFullYear()%100).toString().padStart(2,'0');
+    mrow.appendChild(lbl);
+    cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+  }
+  wrap.appendChild(mrow);
+
+  // Dots
+  data.milestones.forEach(m => {
+    const d = new Date(m.date+'T00:00:00');
+    const pct = ((d-start)/span)*100;
+    if(pct < -2 || pct > 102) return;
+    const color = CATEGORY_COLORS[m.category]||'#0f2340';
+    const dot = document.createElement('div');
+    dot.className='milestone-dot'; dot.style.left=pct+'%'; dot.style.color=color; dot.style.background=color;
+    dot.title=m.name+' — '+fmtDate(m.date);
+    dot.onclick = () => { if(confirm('Delete milestone "'+m.name+'"?')) deleteMilestone(m.id); };
+    const lbl = document.createElement('div');
+    lbl.className='milestone-label'; lbl.style.left=pct+'%'; lbl.textContent=m.name;
+    const dlbl = document.createElement('div');
+    dlbl.className='milestone-date-label'; dlbl.style.left=pct+'%'; dlbl.textContent=fmtDate(m.date);
+    wrap.appendChild(dot); wrap.appendChild(lbl); wrap.appendChild(dlbl);
+  });
+}
+
+document.getElementById('tlStart').addEventListener('change', renderTimeline);
+document.getElementById('tlEnd').addEventListener('change', renderTimeline);
+
+// ── MEETINGS ──────────────────────────────────────────────────────────────────
+function addMeeting() {
+  const row = {
+    id:uid(),
+    date:   document.getElementById('mt-date').value,
+    type:   document.getElementById('mt-type').value,
+    attendees: document.getElementById('mt-attendees').value.trim(),
+    topics: document.getElementById('mt-topics').value.trim(),
+    actions:document.getElementById('mt-actions').value.trim(),
+    owner:  document.getElementById('mt-owner').value.trim(),
+    due:    document.getElementById('mt-due').value,
+    status: document.getElementById('mt-status').value,
+  };
+  if(!row.date) { alert('Date is required.'); return; }
+  data.meetings.unshift(row);
+  closeModal('meeting');
+  ['mt-attendees','mt-topics','mt-actions','mt-owner'].forEach(id=>document.getElementById(id).value='');
+  renderMeetings(); renderSummary();
+}
+function deleteMeeting(id) { if(!confirm('Delete this meeting?')) return; data.meetings=data.meetings.filter(m=>m.id!==id); renderMeetings(); renderSummary(); }
+
+function renderMeetings(filter='all') {
+  const rows = filter==='all' ? data.meetings : data.meetings.filter(m=>m.type===filter||m.status===filter);
+  document.getElementById('meetingCount').textContent = data.meetings.length + ' meeting' + (data.meetings.length!==1?'s':'');
+  const body = document.getElementById('meetingBody');
+  if(rows.length===0){ body.innerHTML='<tr class="empty-row"><td colspan="9">No meetings match this filter.</td></tr>'; return; }
+  body.innerHTML = rows.map(m=>`<tr>
+    <td>${fmtDate(m.date)}</td>
+    <td>${badge(m.type)}</td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(m.attendees)}">${esc(m.attendees)||'—'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(m.topics)}">${esc(m.topics)||'—'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(m.actions)}">${esc(m.actions)||'—'}</td>
+    <td>${esc(m.owner)||'—'}</td>
+    <td>${fmtDate(m.due)}</td>
+    <td>${badge(m.status)}</td>
+    <td><div class="td-actions"><button class="row-btn del" onclick="deleteMeeting('${m.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+  </tr>`).join('');
+}
+
+// ── SUBMITTALS ────────────────────────────────────────────────────────────────
+function addSubmittal() {
+  const row = {
+    id:uid(),
+    num:     document.getElementById('su-num').value.trim(),
+    desc:    document.getElementById('su-desc').value.trim(),
+    spec:    document.getElementById('su-spec').value.trim(),
+    date:    document.getElementById('su-date').value,
+    pct:     document.getElementById('su-pct').value,
+    commentdue: document.getElementById('su-commentdue').value,
+    responsedue:document.getElementById('su-responsedue').value,
+    comments:document.getElementById('su-comments').value||0,
+    critical:document.getElementById('su-critical').value||0,
+    status:  document.getElementById('su-status').value,
+  };
+  if(!row.desc) { alert('Description is required.'); return; }
+  data.submittals.unshift(row);
+  closeModal('submittal');
+  ['su-num','su-desc','su-spec','su-pct','su-comments','su-critical'].forEach(id=>document.getElementById(id).value='');
+  renderSubmittals(); renderSummary();
+}
+function deleteSubmittal(id) { if(!confirm('Delete this submittal?')) return; data.submittals=data.submittals.filter(s=>s.id!==id); renderSubmittals(); renderSummary(); }
+
+function renderSubmittals(filter='all') {
+  const rows = filter==='all' ? data.submittals : data.submittals.filter(s=>s.status===filter);
+  document.getElementById('submittalCount').textContent = data.submittals.length + ' submittal' + (data.submittals.length!==1?'s':'');
+  const body = document.getElementById('submittalBody');
+  if(rows.length===0){ body.innerHTML='<tr class="empty-row"><td colspan="11">No submittals match this filter.</td></tr>'; return; }
+  body.innerHTML = rows.map(s=>`<tr>
+    <td><strong>${esc(s.num)||'—'}</strong></td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.desc)}">${esc(s.desc)}</td>
+    <td>${esc(s.spec)||'—'}</td>
+    <td>${fmtDate(s.date)}</td>
+    <td><div style="display:flex;align-items:center;gap:6px;">
+      <div style="width:60px;height:5px;background:var(--sand2);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${s.pct||0}%;background:var(--blue);border-radius:3px;"></div></div>
+      <span style="font-size:11px;color:var(--text3);">${s.pct||0}%</span>
+    </div></td>
+    <td>${fmtDate(s.commentdue)}</td>
+    <td>${fmtDate(s.responsedue)}</td>
+    <td style="text-align:center;">${s.comments||0}</td>
+    <td style="text-align:center;"><span style="color:${+s.critical>0?'var(--danger)':'var(--text3)'}; font-weight:${+s.critical>0?600:400};">${s.critical||0}</span></td>
+    <td>${badge(s.status)}</td>
+    <td><div class="td-actions"><button class="row-btn del" onclick="deleteSubmittal('${s.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+  </tr>`).join('');
+}
+
+// ── COORDINATION ──────────────────────────────────────────────────────────────
+function addCoordination() {
+  const row = {
+    id:uid(),
+    date:   document.getElementById('co-date').value,
+    type:   document.getElementById('co-type').value,
+    party:  document.getElementById('co-party').value.trim(),
+    topic:  document.getElementById('co-topic').value.trim(),
+    action: document.getElementById('co-action').value.trim(),
+    owner:  document.getElementById('co-owner').value.trim(),
+    due:    document.getElementById('co-due').value,
+    status: document.getElementById('co-status').value,
+  };
+  if(!row.party) { alert('Agency / Party is required.'); return; }
+  data.coordination.unshift(row);
+  closeModal('coordination');
+  ['co-party','co-topic','co-action','co-owner'].forEach(id=>document.getElementById(id).value='');
+  renderCoordination(); renderSummary();
+}
+function deleteCoordination(id) { if(!confirm('Delete this coordination item?')) return; data.coordination=data.coordination.filter(c=>c.id!==id); renderCoordination(); renderSummary(); }
+
+function renderCoordination(filter='all') {
+  const rows = filter==='all' ? data.coordination : data.coordination.filter(c=>c.type===filter||c.status===filter);
+  document.getElementById('coordCount').textContent = data.coordination.length + ' item' + (data.coordination.length!==1?'s':'');
+  const body = document.getElementById('coordBody');
+  if(rows.length===0){ body.innerHTML='<tr class="empty-row"><td colspan="9">No coordination items match this filter.</td></tr>'; return; }
+  body.innerHTML = rows.map(c=>`<tr>
+    <td>${fmtDate(c.date)}</td>
+    <td>${badge(c.type)}</td>
+    <td>${esc(c.party)||'—'}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(c.topic)}">${esc(c.topic)||'—'}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(c.action)}">${esc(c.action)||'—'}</td>
+    <td>${esc(c.owner)||'—'}</td>
+    <td>${fmtDate(c.due)}</td>
+    <td>${badge(c.status)}</td>
+    <td><div class="td-actions"><button class="row-btn del" onclick="deleteCoordination('${c.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+  </tr>`).join('');
+}
+
+// ── SCOPE ─────────────────────────────────────────────────────────────────────
+function addScope() {
+  const row = {
+    id:uid(),
+    date:     document.getElementById('sc-date').value,
+    desc:     document.getElementById('sc-desc').value.trim(),
+    by:       document.getElementById('sc-by').value.trim(),
+    cost:     document.getElementById('sc-cost').value,
+    schedule: document.getElementById('sc-schedule').value,
+    status:   document.getElementById('sc-status').value,
+    notes:    document.getElementById('sc-notes').value.trim(),
+  };
+  if(!row.desc) { alert('Description is required.'); return; }
+  data.scope.unshift(row);
+  closeModal('scope');
+  ['sc-desc','sc-by','sc-notes'].forEach(id=>document.getElementById(id).value='');
+  renderScope(); renderSummary();
+}
+function deleteScope(id) { if(!confirm('Delete this scope change?')) return; data.scope=data.scope.filter(s=>s.id!==id); renderScope(); renderSummary(); }
+
+function renderScope(filter='all') {
+  const rows = filter==='all' ? data.scope : data.scope.filter(s=>s.status===filter);
+  document.getElementById('scopeCount').textContent = data.scope.length + ' change' + (data.scope.length!==1?'s':'');
+  const body = document.getElementById('scopeBody');
+  if(rows.length===0){ body.innerHTML='<tr class="empty-row"><td colspan="8">No scope changes match this filter.</td></tr>'; return; }
+  const costColor = v => v.includes('Positive')?'impact-pos':v.includes('Negative')?'impact-neg':'impact-neu';
+  body.innerHTML = rows.map(s=>`<tr>
+    <td>${fmtDate(s.date)}</td>
+    <td style="max-width:220px;" title="${esc(s.desc)}">${esc(s.desc)}</td>
+    <td>${esc(s.by)||'—'}</td>
+    <td><span class="impact-chip ${costColor(s.cost)}">${esc(s.cost)}</span></td>
+    <td><span class="impact-chip ${s.schedule.includes('Add')?'impact-neg':s.schedule.includes('Reduce')?'impact-pos':'impact-neu'}">${esc(s.schedule)}</span></td>
+    <td>${badge(s.status)}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.notes)}">${esc(s.notes)||'—'}</td>
+    <td><div class="td-actions"><button class="row-btn del" onclick="deleteScope('${s.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+  </tr>`).join('');
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function filterTable(table, value, btn) {
+  btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(table==='meetings')     renderMeetings(value);
+  if(table==='submittals')   renderSubmittals(value);
+  if(table==='coordination') renderCoordination(value);
+  if(table==='scope')        renderScope(value);
+}
+
+// ── SUMMARY STRIP ─────────────────────────────────────────────────────────────
+function renderSummary() {
+  const openMeetings    = data.meetings.filter(m=>m.status==='Open'||m.status==='Overdue').length;
+  const criticalComments= data.submittals.reduce((s,r)=>s+(+r.critical||0),0);
+  const openCoord       = data.coordination.filter(c=>c.status==='Open'||c.status==='Blocked').length;
+  const realizedScope   = data.scope.filter(s=>s.status==='Realized').length;
+  const potentialScope  = data.scope.filter(s=>s.status==='Potential').length;
+
+  document.getElementById('summaryStrip').innerHTML = `
+    <div class="sum-card${openMeetings>0?' warn':''}">
+      <div class="sum-num">${data.meetings.length}</div>
+      <div class="sum-label">Meetings</div>
+    </div>
+    <div class="sum-card${criticalComments>0?' danger':''}">
+      <div class="sum-num">${criticalComments}</div>
+      <div class="sum-label">Critical Comments</div>
+    </div>
+    <div class="sum-card${openCoord>0?' warn':''}">
+      <div class="sum-num">${openCoord}</div>
+      <div class="sum-label">Open Coord Items</div>
+    </div>
+    <div class="sum-card${realizedScope>0?' warn':''}">
+      <div class="sum-num">${realizedScope}</div>
+      <div class="sum-label">Realized Changes</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num">${potentialScope}</div>
+      <div class="sum-label">Potential Changes</div>
+    </div>
+  `;
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+function saveData() {
+  data.project = document.getElementById('projectName').value;
+  data.tlStart  = document.getElementById('tlStart').value;
+  data.tlEnd    = document.getElementById('tlEnd').value;
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (data.project||'project').replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_tracker.json';
+  a.click();
+}
+
+function loadData() { document.getElementById('fileInput').click(); }
+
+function handleLoad(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const loaded = JSON.parse(ev.target.result);
+      data = loaded;
+      document.getElementById('projectName').value = data.project||'';
+      if(data.tlStart) document.getElementById('tlStart').value = data.tlStart;
+      if(data.tlEnd)   document.getElementById('tlEnd').value   = data.tlEnd;
+      renderAll();
+    } catch(err) { alert('Invalid file. Please load a valid project tracker JSON.'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function exportAll() { saveData(); }
+
+function renderAll() {
+  renderTimeline(); renderMeetings(); renderSubmittals();
+  renderCoordination(); renderScope(); renderSummary();
+}
+
+// ── PROJECT NAME SYNC ─────────────────────────────────────────────────────────
+document.getElementById('projectName').addEventListener('input', e => {
+  data.project = e.target.value;
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Set default timeline range: today to +12 months
+const today = new Date();
+const nextYear = new Date(today);
+nextYear.setFullYear(nextYear.getFullYear()+1);
+document.getElementById('tlStart').value = today.toISOString().split('T')[0];
+document.getElementById('tlEnd').value   = nextYear.toISOString().split('T')[0];
+
+renderAll();
+</script>
+</body>
+</html>
