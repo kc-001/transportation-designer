@@ -482,7 +482,7 @@ tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('milestone')">Cancel</button>
-      <button class="btn btn-primary" onclick="addMilestone()">Add Milestone</button>
+      <button class="btn btn-primary modal-save-btn" onclick="saveMilestone()">Add Milestone</button>
     </div>
   </div>
 </div>
@@ -537,7 +537,7 @@ tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('meeting')">Cancel</button>
-      <button class="btn btn-primary" onclick="addMeeting()">Add Meeting</button>
+      <button class="btn btn-primary modal-save-btn" onclick="saveMeeting()">Add Meeting</button>
     </div>
   </div>
 </div>
@@ -598,7 +598,7 @@ tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('submittal')">Cancel</button>
-      <button class="btn btn-primary" onclick="addSubmittal()">Add Submittal</button>
+      <button class="btn btn-primary modal-save-btn" onclick="saveSubmittal()">Add Submittal</button>
     </div>
   </div>
 </div>
@@ -652,7 +652,7 @@ tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('coordination')">Cancel</button>
-      <button class="btn btn-primary" onclick="addCoordination()">Add Item</button>
+      <button class="btn btn-primary modal-save-btn" onclick="saveCoordination()">Add Item</button>
     </div>
   </div>
 </div>
@@ -704,7 +704,7 @@ tbody tr.empty-row td { color: var(--text3); font-size: 12px; text-align: center
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('scope')">Cancel</button>
-      <button class="btn btn-primary" onclick="addScope()">Add Change</button>
+      <button class="btn btn-primary modal-save-btn" onclick="saveScope()">Add Change</button>
     </div>
   </div>
 </div>
@@ -723,10 +723,15 @@ let data = {
   scope: []
 };
 
+// Track which record is being edited (null = add mode)
+let editingId = { milestone:null, meeting:null, submittal:null, coordination:null, scope:null };
+
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
 const uid = () => '_' + Math.random().toString(36).slice(2,9);
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const setVal = (id,v) => { const el=document.getElementById(id); if(el) el.value=v||''; };
+const setSelect = (id,v) => { const el=document.getElementById(id); if(el && v) el.value=v; };
 
 const STATUS_COLORS = {
   'Open':'badge-blue','In Progress':'badge-yellow','Complete':'badge-green','Closed':'badge-green',
@@ -742,38 +747,111 @@ const CATEGORY_COLORS = {
   'Deadline':'#B91C1C','Milestone':'#0f2340'
 };
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
+// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
+function setModalMode(type, mode) {
+  // mode: 'add' | 'edit'
+  const modal = document.getElementById(type+'Modal');
+  const title = modal.querySelector('.modal-title');
+  const saveBtn = modal.querySelector('.modal-save-btn');
+  const isEdit = mode === 'edit';
+  const labels = { milestone:'Milestone', meeting:'Meeting', submittal:'Submittal', coordination:'Coordination Item', scope:'Scope Change' };
+  title.textContent = (isEdit ? 'Edit ' : 'Add ') + labels[type];
+  saveBtn.textContent = isEdit ? 'Save Changes' : 'Add ' + labels[type];
+}
+
 function openModal(type) {
-  document.getElementById(type+'Modal').classList.add('open');
+  editingId[type] = null;
+  setModalMode(type, 'add');
+  // Clear fields
+  clearModal(type);
   // Set today as default date
   const today = new Date().toISOString().split('T')[0];
-  const dateField = document.getElementById(
-    type==='milestone'?'ms-date':type==='meeting'?'mt-date':
-    type==='submittal'?'su-date':type==='coordination'?'co-date':'sc-date'
-  );
-  if(dateField && !dateField.value) dateField.value = today;
+  const dateIds = { milestone:'ms-date', meeting:'mt-date', submittal:'su-date', coordination:'co-date', scope:'sc-date' };
+  const df = document.getElementById(dateIds[type]);
+  if(df && !df.value) df.value = today;
+  document.getElementById(type+'Modal').classList.add('open');
 }
-function closeModal(type) { document.getElementById(type+'Modal').classList.remove('open'); }
+
+function openEditModal(type, id) {
+  editingId[type] = id;
+  setModalMode(type, 'edit');
+  // Populate fields from record
+  if(type==='milestone') {
+    const r = data.milestones.find(m=>m.id===id); if(!r) return;
+    setVal('ms-name', r.name); setVal('ms-date', r.date); setSelect('ms-category', r.category);
+  } else if(type==='meeting') {
+    const r = data.meetings.find(m=>m.id===id); if(!r) return;
+    setVal('mt-date',r.date); setSelect('mt-type',r.type); setVal('mt-attendees',r.attendees);
+    setVal('mt-topics',r.topics); setVal('mt-actions',r.actions);
+    setVal('mt-owner',r.owner); setVal('mt-due',r.due); setSelect('mt-status',r.status);
+  } else if(type==='submittal') {
+    const r = data.submittals.find(s=>s.id===id); if(!r) return;
+    setVal('su-num',r.num); setVal('su-desc',r.desc); setVal('su-spec',r.spec);
+    setVal('su-date',r.date); setVal('su-pct',r.pct); setVal('su-commentdue',r.commentdue);
+    setVal('su-responsedue',r.responsedue); setVal('su-comments',r.comments);
+    setVal('su-critical',r.critical); setSelect('su-status',r.status);
+  } else if(type==='coordination') {
+    const r = data.coordination.find(c=>c.id===id); if(!r) return;
+    setVal('co-date',r.date); setSelect('co-type',r.type); setVal('co-party',r.party);
+    setVal('co-topic',r.topic); setVal('co-action',r.action);
+    setVal('co-owner',r.owner); setVal('co-due',r.due); setSelect('co-status',r.status);
+  } else if(type==='scope') {
+    const r = data.scope.find(s=>s.id===id); if(!r) return;
+    setVal('sc-date',r.date); setVal('sc-desc',r.desc); setVal('sc-by',r.by);
+    setSelect('sc-cost',r.cost); setSelect('sc-schedule',r.schedule);
+    setSelect('sc-status',r.status); setVal('sc-notes',r.notes);
+  }
+  document.getElementById(type+'Modal').classList.add('open');
+}
+
+function clearModal(type) {
+  const fieldSets = {
+    milestone: ['ms-name','ms-date'],
+    meeting:   ['mt-attendees','mt-topics','mt-actions','mt-owner','mt-due'],
+    submittal: ['su-num','su-desc','su-spec','su-pct','su-comments','su-critical','su-commentdue','su-responsedue'],
+    coordination: ['co-party','co-topic','co-action','co-owner','co-due'],
+    scope: ['sc-desc','sc-by','sc-notes']
+  };
+  (fieldSets[type]||[]).forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+function closeModal(type) {
+  document.getElementById(type+'Modal').classList.remove('open');
+  editingId[type] = null;
+}
 
 // Close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+  o.addEventListener('click', e => { if(e.target===o) { const type=o.id.replace('Modal',''); closeModal(type); } });
 });
 
+// Edit button SVG
+const editIcon = `<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const delIcon  = `<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>`;
+const actionBtns = (type, id) => `
+  <div class="td-actions">
+    <button class="row-btn" title="Edit" onclick="openEditModal('${type}','${id}')">${editIcon}</button>
+    <button class="row-btn del" title="Delete" onclick="delete${type.charAt(0).toUpperCase()+type.slice(1)}('${id}')">${delIcon}</button>
+  </div>`;
+
 // ── MILESTONE ─────────────────────────────────────────────────────────────────
-function addMilestone() {
+function saveMilestone() {
   const name = document.getElementById('ms-name').value.trim();
   const date = document.getElementById('ms-date').value;
   const cat  = document.getElementById('ms-category').value;
   if(!name || !date) { alert('Name and date are required.'); return; }
-  data.milestones.push({ id:uid(), name, date, category:cat });
+  if(editingId.milestone) {
+    const r = data.milestones.find(m=>m.id===editingId.milestone);
+    if(r) { r.name=name; r.date=date; r.category=cat; }
+  } else {
+    data.milestones.push({ id:uid(), name, date, category:cat });
+  }
   data.milestones.sort((a,b)=>a.date.localeCompare(b.date));
   closeModal('milestone');
-  document.getElementById('ms-name').value='';
-  document.getElementById('ms-date').value='';
   renderTimeline(); renderSummary();
 }
 function deleteMilestone(id) {
+  if(!confirm('Delete this milestone?')) return;
   data.milestones = data.milestones.filter(m=>m.id!==id);
   renderTimeline(); renderSummary();
 }
@@ -835,8 +913,9 @@ function renderTimeline() {
     const color = CATEGORY_COLORS[m.category]||'#0f2340';
     const dot = document.createElement('div');
     dot.className='milestone-dot'; dot.style.left=pct+'%'; dot.style.color=color; dot.style.background=color;
-    dot.title=m.name+' — '+fmtDate(m.date);
-    dot.onclick = () => { if(confirm('Delete milestone "'+m.name+'"?')) deleteMilestone(m.id); };
+    dot.title = m.name+' — '+fmtDate(m.date)+'\nClick to edit | Right-click to delete';
+    dot.onclick = () => openEditModal('milestone', m.id);
+    dot.oncontextmenu = e => { e.preventDefault(); if(confirm('Delete milestone "'+m.name+'"?')) deleteMilestone(m.id); };
     const lbl = document.createElement('div');
     lbl.className='milestone-label'; lbl.style.left=pct+'%'; lbl.textContent=m.name;
     const dlbl = document.createElement('div');
@@ -849,22 +928,25 @@ document.getElementById('tlStart').addEventListener('change', renderTimeline);
 document.getElementById('tlEnd').addEventListener('change', renderTimeline);
 
 // ── MEETINGS ──────────────────────────────────────────────────────────────────
-function addMeeting() {
+function saveMeeting() {
   const row = {
-    id:uid(),
-    date:   document.getElementById('mt-date').value,
-    type:   document.getElementById('mt-type').value,
+    date:      document.getElementById('mt-date').value,
+    type:      document.getElementById('mt-type').value,
     attendees: document.getElementById('mt-attendees').value.trim(),
-    topics: document.getElementById('mt-topics').value.trim(),
-    actions:document.getElementById('mt-actions').value.trim(),
-    owner:  document.getElementById('mt-owner').value.trim(),
-    due:    document.getElementById('mt-due').value,
-    status: document.getElementById('mt-status').value,
+    topics:    document.getElementById('mt-topics').value.trim(),
+    actions:   document.getElementById('mt-actions').value.trim(),
+    owner:     document.getElementById('mt-owner').value.trim(),
+    due:       document.getElementById('mt-due').value,
+    status:    document.getElementById('mt-status').value,
   };
   if(!row.date) { alert('Date is required.'); return; }
-  data.meetings.unshift(row);
+  if(editingId.meeting) {
+    const idx = data.meetings.findIndex(m=>m.id===editingId.meeting);
+    if(idx>-1) data.meetings[idx] = { ...data.meetings[idx], ...row };
+  } else {
+    data.meetings.unshift({ id:uid(), ...row });
+  }
   closeModal('meeting');
-  ['mt-attendees','mt-topics','mt-actions','mt-owner'].forEach(id=>document.getElementById(id).value='');
   renderMeetings(); renderSummary();
 }
 function deleteMeeting(id) { if(!confirm('Delete this meeting?')) return; data.meetings=data.meetings.filter(m=>m.id!==id); renderMeetings(); renderSummary(); }
@@ -883,29 +965,32 @@ function renderMeetings(filter='all') {
     <td>${esc(m.owner)||'—'}</td>
     <td>${fmtDate(m.due)}</td>
     <td>${badge(m.status)}</td>
-    <td><div class="td-actions"><button class="row-btn del" onclick="deleteMeeting('${m.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+    <td>${actionBtns('meeting', m.id)}</td>
   </tr>`).join('');
 }
 
 // ── SUBMITTALS ────────────────────────────────────────────────────────────────
-function addSubmittal() {
+function saveSubmittal() {
   const row = {
-    id:uid(),
-    num:     document.getElementById('su-num').value.trim(),
-    desc:    document.getElementById('su-desc').value.trim(),
-    spec:    document.getElementById('su-spec').value.trim(),
-    date:    document.getElementById('su-date').value,
-    pct:     document.getElementById('su-pct').value,
+    num:        document.getElementById('su-num').value.trim(),
+    desc:       document.getElementById('su-desc').value.trim(),
+    spec:       document.getElementById('su-spec').value.trim(),
+    date:       document.getElementById('su-date').value,
+    pct:        document.getElementById('su-pct').value,
     commentdue: document.getElementById('su-commentdue').value,
     responsedue:document.getElementById('su-responsedue').value,
-    comments:document.getElementById('su-comments').value||0,
-    critical:document.getElementById('su-critical').value||0,
-    status:  document.getElementById('su-status').value,
+    comments:   document.getElementById('su-comments').value||0,
+    critical:   document.getElementById('su-critical').value||0,
+    status:     document.getElementById('su-status').value,
   };
   if(!row.desc) { alert('Description is required.'); return; }
-  data.submittals.unshift(row);
+  if(editingId.submittal) {
+    const idx = data.submittals.findIndex(s=>s.id===editingId.submittal);
+    if(idx>-1) data.submittals[idx] = { ...data.submittals[idx], ...row };
+  } else {
+    data.submittals.unshift({ id:uid(), ...row });
+  }
   closeModal('submittal');
-  ['su-num','su-desc','su-spec','su-pct','su-comments','su-critical'].forEach(id=>document.getElementById(id).value='');
   renderSubmittals(); renderSummary();
 }
 function deleteSubmittal(id) { if(!confirm('Delete this submittal?')) return; data.submittals=data.submittals.filter(s=>s.id!==id); renderSubmittals(); renderSummary(); }
@@ -927,16 +1012,15 @@ function renderSubmittals(filter='all') {
     <td>${fmtDate(s.commentdue)}</td>
     <td>${fmtDate(s.responsedue)}</td>
     <td style="text-align:center;">${s.comments||0}</td>
-    <td style="text-align:center;"><span style="color:${+s.critical>0?'var(--danger)':'var(--text3)'}; font-weight:${+s.critical>0?600:400};">${s.critical||0}</span></td>
+    <td style="text-align:center;"><span style="color:${+s.critical>0?'var(--danger)':'var(--text3)'};font-weight:${+s.critical>0?600:400};">${s.critical||0}</span></td>
     <td>${badge(s.status)}</td>
-    <td><div class="td-actions"><button class="row-btn del" onclick="deleteSubmittal('${s.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+    <td>${actionBtns('submittal', s.id)}</td>
   </tr>`).join('');
 }
 
 // ── COORDINATION ──────────────────────────────────────────────────────────────
-function addCoordination() {
+function saveCoordination() {
   const row = {
-    id:uid(),
     date:   document.getElementById('co-date').value,
     type:   document.getElementById('co-type').value,
     party:  document.getElementById('co-party').value.trim(),
@@ -947,9 +1031,13 @@ function addCoordination() {
     status: document.getElementById('co-status').value,
   };
   if(!row.party) { alert('Agency / Party is required.'); return; }
-  data.coordination.unshift(row);
+  if(editingId.coordination) {
+    const idx = data.coordination.findIndex(c=>c.id===editingId.coordination);
+    if(idx>-1) data.coordination[idx] = { ...data.coordination[idx], ...row };
+  } else {
+    data.coordination.unshift({ id:uid(), ...row });
+  }
   closeModal('coordination');
-  ['co-party','co-topic','co-action','co-owner'].forEach(id=>document.getElementById(id).value='');
   renderCoordination(); renderSummary();
 }
 function deleteCoordination(id) { if(!confirm('Delete this coordination item?')) return; data.coordination=data.coordination.filter(c=>c.id!==id); renderCoordination(); renderSummary(); }
@@ -968,14 +1056,13 @@ function renderCoordination(filter='all') {
     <td>${esc(c.owner)||'—'}</td>
     <td>${fmtDate(c.due)}</td>
     <td>${badge(c.status)}</td>
-    <td><div class="td-actions"><button class="row-btn del" onclick="deleteCoordination('${c.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+    <td>${actionBtns('coordination', c.id)}</td>
   </tr>`).join('');
 }
 
 // ── SCOPE ─────────────────────────────────────────────────────────────────────
-function addScope() {
+function saveScope() {
   const row = {
-    id:uid(),
     date:     document.getElementById('sc-date').value,
     desc:     document.getElementById('sc-desc').value.trim(),
     by:       document.getElementById('sc-by').value.trim(),
@@ -985,9 +1072,13 @@ function addScope() {
     notes:    document.getElementById('sc-notes').value.trim(),
   };
   if(!row.desc) { alert('Description is required.'); return; }
-  data.scope.unshift(row);
+  if(editingId.scope) {
+    const idx = data.scope.findIndex(s=>s.id===editingId.scope);
+    if(idx>-1) data.scope[idx] = { ...data.scope[idx], ...row };
+  } else {
+    data.scope.unshift({ id:uid(), ...row });
+  }
   closeModal('scope');
-  ['sc-desc','sc-by','sc-notes'].forEach(id=>document.getElementById(id).value='');
   renderScope(); renderSummary();
 }
 function deleteScope(id) { if(!confirm('Delete this scope change?')) return; data.scope=data.scope.filter(s=>s.id!==id); renderScope(); renderSummary(); }
@@ -1006,7 +1097,7 @@ function renderScope(filter='all') {
     <td><span class="impact-chip ${s.schedule.includes('Add')?'impact-neg':s.schedule.includes('Reduce')?'impact-pos':'impact-neu'}">${esc(s.schedule)}</span></td>
     <td>${badge(s.status)}</td>
     <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.notes)}">${esc(s.notes)||'—'}</td>
-    <td><div class="td-actions"><button class="row-btn del" onclick="deleteScope('${s.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></div></td>
+    <td>${actionBtns('scope', s.id)}</td>
   </tr>`).join('');
 }
 
