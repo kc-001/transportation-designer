@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vertical Curve Length &amp; Sight Distance Check &mdash; TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2340;--navy-light:#234570;--blue:#1B6AC9;--blue-dim:rgba(27,106,201,.10);--blue-border:rgba(27,106,201,.25);--sand:#F5F2ED;--sand2:#EDE9E2;--sand3:#DDD8CF;--text:#0f2340;--text2:#3D5470;--text3:#7A90A8;--ok:#0D7A4E;--ok-dim:rgba(13,122,78,.10);--ok-border:rgba(13,122,78,.25);--warn:#C47D0A;--warn-dim:rgba(196,125,10,.10);--warn-border:rgba(196,125,10,.25);--danger:#B91C1C;--danger-dim:rgba(185,28,28,.10);--danger-border:rgba(185,28,28,.25);--radius:8px;--radius-lg:14px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--shadow-sm:0 1px 3px rgba(15,35,64,.08)}
+html{scroll-behavior:smooth}body{font-family:var(--sans);background:var(--sand);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--sand3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}.nav-logo{width:30px;height:30px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center}.nav-logo svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2}.nav-wordmark{font-family:var(--serif);font-size:15px;color:var(--navy)}.nav-wordmark span{color:var(--blue)}.nav-sub{font-size:11px;color:var(--text3);padding-left:12px;border-left:1px solid var(--sand3)}
+.page-header{background:var(--navy);padding:2.25rem 2rem 2rem;position:relative;overflow:hidden}.phbg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}.phi{max-width:980px;margin:0 auto;position:relative}.page-header h1{font-family:var(--serif);font-size:1.65rem;color:white;letter-spacing:-.02em;line-height:1.2}.page-header p{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;max-width:620px}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.badge{display:inline-flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500}
+.main{max-width:980px;margin:0 auto;padding:1.5rem 2rem 4rem;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start}@media(max-width:780px){.main{grid-template-columns:1fr;padding:1rem}}
+.card{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}.card:last-child{margin-bottom:0}
+.ch{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;gap:10px}.ci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ci svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8}.ct{font-family:var(--serif);font-size:1rem;color:var(--navy)}.cb{padding:1.1rem 1.25rem}
+.sec-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}.sec-lbl::after{content:'';flex:1;height:1px;background:var(--sand3)}
+.fg{margin-bottom:12px}.fl{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}.fh{font-size:10px;color:var(--text3);font-weight:400}.iw{position:relative}
+.fi,.fs{width:100%;font-family:var(--sans);font-size:13px;color:var(--text);background:white;border:1px solid var(--sand3);border-radius:var(--radius);padding:9px 12px;outline:none;transition:border-color .15s}.fi{padding-right:52px}.fi:focus,.fs:focus{border-color:var(--blue-border)}.fi::placeholder{color:var(--text3)}.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:500;pointer-events:none}
+.cb-btn{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;padding:12px;border-radius:var(--radius);border:none;background:var(--navy);color:white;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}.cb-btn:hover{background:var(--navy-light);transform:translateY(-1px)}.cb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.rs-btn{width:100%;font-family:var(--sans);font-size:12px;padding:8px;border-radius:var(--radius);border:1px solid var(--sand3);background:white;color:var(--text3);cursor:pointer;margin-top:8px;transition:all .15s}.rs-btn:hover{background:var(--sand);color:var(--text)}
+.rg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:1rem}.rg3{grid-template-columns:repeat(3,1fr)}
+.rc{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px}.rc.hi{background:var(--blue-dim);border-color:var(--blue-border)}.rc.ok{background:var(--ok-dim);border-color:var(--ok-border)}.rc.wn{background:var(--warn-dim);border-color:var(--warn-border)}.rc.dn{background:var(--danger-dim);border-color:var(--danger-border)}
+.rl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}.rv{font-family:var(--serif);font-size:1.55rem;color:var(--navy);line-height:1}.rc.hi .rv{color:var(--blue)}.rc.ok .rv{color:var(--ok)}.rc.wn .rv{color:var(--warn)}.rc.dn .rv{color:var(--danger)}.rn{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+.al{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-top:10px;border:1px solid transparent;line-height:1.5}.al-wn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn)}.al-ok{background:var(--ok-dim);border-color:var(--ok-border);color:var(--ok)}.al-dn{background:var(--danger-dim);border-color:var(--danger-border);color:var(--danger)}.al-info{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.fb{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:11px 13px;margin-bottom:9px}.fb:last-child{margin-bottom:0}.fn{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.fe{font-size:12.5px;font-weight:500;color:var(--navy);font-family:'Courier New',monospace;line-height:1.6}.fv{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.7}
+.diag-wrap{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}
+.diag-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;justify-content:space-between}.diag-title{font-family:var(--serif);font-size:1rem;color:var(--navy)}.diag-sub{font-size:11px;color:var(--text3)}
+.diag-body{padding:.75rem 1.25rem 1rem}
+table.rt{width:100%;border-collapse:collapse;font-size:12px}.rt th{background:var(--sand);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--sand3)}.rt td{padding:6px 10px;border-bottom:1px solid var(--sand2);color:var(--text)}.rt tr:last-child td{border-bottom:none}.rt tr:hover td{background:var(--sand)}.rt tr.hl td{background:var(--blue-dim);color:var(--blue);font-weight:600}
+.worked-ex{background:var(--sand);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.75}
+.worked-ex code{background:white;border:1px solid var(--sand3);border-radius:4px;padding:8px 12px;display:block;font-family:'Courier New',monospace;font-size:12px;color:var(--navy);margin:8px 0}
+.worked-ex strong{color:var(--navy)}</style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="../../index.html"><div class="nav-logo"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="nav-wordmark">Transportation<span>Designer</span></div></a>
+  <span class="nav-sub">Vertical Curve Length &amp; Sight Distance Check</span>
+</nav>
+<div class="page-header"><div class="phbg"></div><div class="phi">
+  <h1>Vertical Curve Length &amp; Sight Distance Check</h1><p>Determine required vertical curve length from stopping sight distance requirements and check K-value compliance</p>
+  <div class="badges"><div class="badge">AASHTO Green Book Eq. 3-43 / 3-47</div><div class="badge">FDOT Design Standards</div><div class="badge">AASHTO Green Book §3.3</div></div>
+</div></div>
+<div class="main">
+  <div><div class="card"><div class="ch"><div class="ci" style="background:var(--navy)"><svg viewBox="0 0 24 24"><polyline points="3 17 8 8 14 14 19 6"/></svg></div><span class="ct">Inputs</span></div><div class="cb"><div class="fg"><div class="fl">Curve Type</div><select class="fs" id="vct16"><option value="crest">Crest (Summit)</option><option value="sag">Sag</option></select></div><div class="sec-lbl">Design Parameters</div><div class="fg"><div class="fl">Design Speed</div><div class="iw"><input class="fi" type="number" id="V16" placeholder="e.g. 60" step="any"><span class="iu">mph</span></div></div><div class="fg"><div class="fl">Algebraic Grade Difference |A|<span class="fh">|g2 &minus; g1|, always positive</span></div><div class="iw"><input class="fi" id="A16" placeholder="e.g. 4.0" step="any" type="number"><span class="iu">%</span></div></div><div class="sec-lbl">Sight Distance</div><div class="fg"><div class="fl">Stopping Sight Distance (S)<span class="fh">Enter AASHTO SSD for design speed, or calculate below</span></div><div class="iw"><input class="fi" type="number" id="S16" placeholder="e.g. 570" step="any"><span class="iu">ft</span></div></div><div class="fg"><div class="fl">Driver Eye Height (h<sub>1</sub>)<span class="fh">AASHTO: 3.5 ft</span></div><div class="iw"><input class="fi" type="number" id="h1_16" placeholder="3.5" step="any"><span class="iu">ft</span></div></div><div class="fg"><div class="fl">Object Height (h<sub>2</sub>)<span class="fh">AASHTO: 2.0 ft (tail light) · 0.0 for headlights</span></div><div class="iw"><input class="fi" type="number" id="h2_16" placeholder="2.0" step="any"><span class="iu">ft</span></div></div><button class="cb-btn" onclick="calculate()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Calculate</button><button class="rs-btn" onclick="resetAll()">Reset</button></div></div></div>
+  <div><div class="diag-wrap"><div class="diag-hdr"><span class="diag-title">Vertical Curve Sight Distance Diagram</span><span class="diag-sub" id="diagSub">Enter values to generate diagram</span></div><div class="diag-body"><svg id="vchkSvg" viewBox="0 0 540 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block"><defs><marker id="ahC" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#1B6AC9"/></marker><marker id="ahCL" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path d="M7,0 L7,7 L0,3.5 z" fill="#1B6AC9"/></marker><marker id="ahCG" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#0D7A4E"/></marker></defs><g id="vchkG"></g></svg></div></div><div class="card"><div class="ch"><div class="ci" style="background:var(--blue)"><svg viewBox="0 0 24 24"><polyline points="3 17 8 8 14 14 19 6"/></svg></div><span class="ct">Results</span></div><div class="cb"><div class="rg"><div class="rc hi"><div class="rl">Required Min Length (L)</div><div class="rv" id="v16_L">&#8212;</div><div class="rn" id="v16_L_n"></div></div><div class="rc hi"><div class="rl">Required K-Value</div><div class="rv" id="v16_K">&#8212;</div><div class="rn" id="v16_K_n"></div></div><div class="rc "><div class="rl">AASHTO Min SSD</div><div class="rv" id="v16_SSD">&#8212;</div><div class="rn" id="v16_SSD_n"></div></div><div class="rc "><div class="rl">Governing Case</div><div class="rv" id="v16_gov">&#8212;</div><div class="rn" id="v16_gov_n"></div></div></div><div id="v16Alert"></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#C47D0A"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">AASHTO K-Value Reference</span></div><div class="cb"><div style="overflow-x:auto"><table class="rt"><thead><tr><th>Speed (mph)</th><th>Min K — Crest</th><th>Min K — Sag</th></tr></thead><tbody><tr id="k16r30"><td>30 mph</td><td>19 ft</td><td>37 ft</td></tr><tr id="k16r35"><td>35 mph</td><td>29 ft</td><td>49 ft</td></tr><tr id="k16r40"><td>40 mph</td><td>44 ft</td><td>64 ft</td></tr><tr id="k16r45"><td>45 mph</td><td>61 ft</td><td>79 ft</td></tr><tr id="k16r50"><td>50 mph</td><td>84 ft</td><td>96 ft</td></tr><tr id="k16r55"><td>55 mph</td><td>114 ft</td><td>115 ft</td></tr><tr id="k16r60"><td>60 mph</td><td>151 ft</td><td>136 ft</td></tr><tr id="k16r65"><td>65 mph</td><td>193 ft</td><td>157 ft</td></tr><tr id="k16r70"><td>70 mph</td><td>247 ft</td><td>181 ft</td></tr><tr id="k16r75"><td>75 mph</td><td>312 ft</td><td>206 ft</td></tr><tr id="k16r80"><td>80 mph</td><td>384 ft</td><td>231 ft</td></tr></tbody></table></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">AASHTO SSD Quick Lookup</span></div><div class="cb"><div style="overflow-x:auto"><table class="rt"><thead><tr><th>Speed (mph)</th><th>AASHTO Min SSD (ft)</th></tr></thead><tbody><tr id="s16r20"><td>20 mph</td><td>115 ft</td></tr><tr id="s16r25"><td>25 mph</td><td>155 ft</td></tr><tr id="s16r30"><td>30 mph</td><td>200 ft</td></tr><tr id="s16r35"><td>35 mph</td><td>250 ft</td></tr><tr id="s16r40"><td>40 mph</td><td>305 ft</td></tr><tr id="s16r45"><td>45 mph</td><td>360 ft</td></tr><tr id="s16r50"><td>50 mph</td><td>425 ft</td></tr><tr id="s16r55"><td>55 mph</td><td>495 ft</td></tr><tr id="s16r60"><td>60 mph</td><td>570 ft</td></tr><tr id="s16r65"><td>65 mph</td><td>645 ft</td></tr><tr id="s16r70"><td>70 mph</td><td>730 ft</td></tr><tr id="s16r75"><td>75 mph</td><td>820 ft</td></tr><tr id="s16r80"><td>80 mph</td><td>910 ft</td></tr></tbody></table></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">Governing Equations</span></div><div class="cb"><div class="fb"><div class="fn">Crest — Case 1: S &le; L (sight distance within curve)</div><div class="fe">L = A &times; S&sup2; / [100 &times; (&radic;2h<sub>1</sub> + &radic;2h<sub>2</sub>)&sup2;]</div><div class="fv"><b>A</b> = |g2&minus;g1| (%) &middot; <b>S</b> = SSD (ft) &middot; <b>h1</b> = 3.5 ft &middot; <b>h2</b> = 2.0 ft (object)</div></div><div class="fb"><div class="fn">Crest — Case 2: S &gt; L (sight line extends beyond curve)</div><div class="fe">L = 2S &minus; [100 &times; (&radic;2h<sub>1</sub> + &radic;2h<sub>2</sub>)&sup2;] / A</div><div class="fv">Use when curve is shorter than sight distance — conservative result</div></div><div class="fb"><div class="fn">Sag — Headlight Criterion (S &le; L)</div><div class="fe">L = A &times; S&sup2; / (400 + 3.5S)</div><div class="fv">Governs nighttime conditions based on 2&deg; upward headlight beam and 0.6 m object height</div></div><div class="fb"><div class="fn">Sag — Overhead Clearance (check separately)</div><div class="fe">L = A &times; S&sup2; / (800 &times; C)</div><div class="fv"><b>C</b> = structure clearance minus driver/object heights</div></div><div class="fb"><div class="fn">K-Value</div><div class="fe">K = L / A</div><div class="fv">Rate of grade change per percent &mdash; used directly in plan check</div></div></div></div></div>
+</div>
+<script>
+
+var SSD16={20:115,25:155,30:200,35:250,40:305,45:360,50:425,55:495,60:570,65:645,70:730,75:820,80:910};
+var KC16={30:19,35:29,40:44,45:61,50:84,55:114,60:151,65:193,70:247,75:312,80:384}, KS16={30:37,35:49,40:64,45:79,50:96,55:115,60:136,65:157,70:181,75:206,80:231};
+var NS16='http://www.w3.org/2000/svg';
+function svgEl16(tag,a){var e=document.createElementNS(NS16,tag);Object.keys(a).forEach(function(k){e.setAttribute(k,a[k]);});return e;}
+function svgR(x,y,w,h,fill){return svgEl16('rect',{x:x,y:y,width:Math.max(0,w),height:h,fill:fill});}
+function svgL(x1,y1,x2,y2,stroke,sw,da){var a={x1:x1,y1:y1,x2:x2,y2:y2,stroke:stroke,'stroke-width':sw||1};if(da)a['stroke-dasharray']=da;return svgEl16('line',a);}
+function svgC(cx,cy,r,fill){return svgEl16('circle',{cx:cx,cy:cy,r:r,fill:fill});}
+function svgT(x,y,str,fill,sz,anchor,weight){var e=svgEl16('text',{x:x,y:y,'font-family':'DM Sans,sans-serif','font-size':sz||10,fill:fill||'#0f2340','text-anchor':anchor||'middle'});if(weight)e.setAttribute('font-weight',weight);e.textContent=str;return e;}
+function svgP(d,fill,stroke,sw){return svgEl16('path',{d:d,fill:fill||'none',stroke:stroke||'#1B6AC9','stroke-width':sw||2});}
+
+function calculate(){
+  var type=document.getElementById('vct16').value;
+  var V=fv('V16'),A=fv('A16'),S=fv('S16'),h1=fv('h1_16'),h2=fv('h2_16');
+  if(isNaN(h1))h1=3.5; if(isNaN(h2))h2=2.0;
+  if(isNaN(V)||isNaN(A)||A<=0){alert('Enter Design Speed and |A| (must be > 0).');return;}
+  if(isNaN(S)){var key=Math.round(V/5)*5;S=SSD16[key];if(!S){alert('Enter Sight Distance or select a standard design speed.');return;}sv('S16',S);}
+
+  var L,caseDesc,La,Lb;
+  if(type==='crest'){
+    var denom=100*Math.pow(Math.sqrt(2*h1)+Math.sqrt(2*h2),2);
+    La=A*S*S/denom;     // Case 1: S <= L
+    Lb=2*S-denom/A;     // Case 2: S > L
+    // Check which case governs
+    if(S<=La){L=La;caseDesc='Case 1: S &le; L (sight distance within curve)';}
+    else{L=Math.max(Lb,La);caseDesc='Case 2: S &gt; L (curve shorter than sight distance &mdash; conservative)';}
+    L=Math.max(L,50);
+  } else {
+    // Sag — headlight criterion
+    La=A*S*S/(400+3.5*S);  // S <= L
+    Lb=2*S-(400+3.5*S)/A;  // S > L
+    if(S<=La){L=La;caseDesc='Headlight criterion: S &le; L';}
+    else{L=Math.max(Lb,La);caseDesc='Headlight criterion: S &gt; L (conservative)';}
+    L=Math.max(L,50);
+  }
+
+  var K=L/A;
+  var Vkey=Math.round(V/5)*5;
+  var aMin=SSD16[Vkey];
+  var kRef=(type==='crest'?KC16:KS16)[Vkey];
+
+  sv('v16_L',L.toFixed(0)+' ft'); sv('v16_K',K.toFixed(1)+' ft/%');
+  sv('v16_SSD',aMin?aMin+' ft for '+Vkey+' mph':'—');
+  sv('v16_gov',caseDesc);
+
+  // Highlight table rows
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  var kr=document.getElementById('k16r'+Vkey);if(kr)kr.classList.add('hl');
+  var sr=document.getElementById('s16r'+Vkey);if(sr)sr.classList.add('hl');
+
+  var box=document.getElementById('v16Alert');
+  if(aMin&&S<aMin){
+    box.innerHTML='<div class="al al-wn">&#9888; Input SSD ('+S+' ft) is below AASHTO minimum of '+aMin+' ft for '+Vkey+' mph. Results computed using your input — use S = '+aMin+' ft for design.</div>';
+  } else if(kRef){
+    var ok=K>=kRef;
+    box.innerHTML='<div class="al al-'+(ok?'ok':'dn')+'">'+(ok?'&#10003;':'&#10007;')+' K = '+K.toFixed(1)+(ok?' meets':' is below')+' AASHTO minimum K = '+kRef+' for '+Vkey+' mph '+type+' curve.'+(ok?'':' Increase S or reduce A.')+' Required L = '+L.toFixed(0)+' ft.</div>';
+  }
+
+  drawVChk(type,S,L,A,V,K,h1,h2,caseDesc);
+  sv('diagSub','V = '+V+' mph &middot; S = '+S+' ft &middot; Required L = '+L.toFixed(0)+' ft &middot; K = '+K.toFixed(1));
+}
+
+function drawVChk(type,S,L,A,V,K,h1,h2,caseDesc){
+  var g=document.getElementById('vchkG');g.innerHTML='';
+  var W=540,H=180,pad=55,plotW=W-2*pad,plotH=H-55;
+  g.appendChild(svgR(0,0,W,H,'#F5F2ED'));
+
+  // Draw schematic vertical curve
+  var isCrest=type==='crest';
+  var bvcX=pad,evcX=pad+plotW,pviX=(bvcX+evcX)/2;
+  var midY=pad+plotH/2;
+  var curveAmp=Math.min(plotH*0.3,30);
+  var bvcY=midY+(isCrest?curveAmp:-curveAmp);
+  var pviY=midY+(isCrest?-curveAmp:curveAmp);
+  var evcY=midY+(isCrest?curveAmp:-curveAmp);
+
+  // Grade tangent lines
+  g.appendChild(svgL(bvcX-25,bvcY+(isCrest?10:-10),bvcX,bvcY,'#DDD8CF',1,'6,3'));
+  g.appendChild(svgL(bvcX,bvcY,pviX,pviY,'#94A3B8',1.2,'8,4'));
+  g.appendChild(svgL(pviX,pviY,evcX,evcY,'#94A3B8',1.2,'8,4'));
+  g.appendChild(svgL(evcX,evcY,evcX+25,evcY+(isCrest?10:-10),'#DDD8CF',1,'6,3'));
+
+  // Curve (quadratic bezier)
+  var qy=pviY+(isCrest?-10:10);
+  var d='M '+bvcX+' '+bvcY+' Q '+pviX+' '+qy+' '+evcX+' '+evcY;
+  g.appendChild(svgP(d,'none','#1B6AC9',2.5));
+
+  // SSD indicator (sight line for crest)
+  if(isCrest){
+    var slScale=plotW/Math.max(L,S);
+    var ssdPx=Math.min(S*slScale,plotW);
+    var driverX=bvcX+10,objectX=Math.min(bvcX+ssdPx,evcX+10);
+    // Line of sight
+    var slL=svgL(driverX,bvcY-4,objectX,evcY-4,'#0D7A4E',1.5,'6,4');
+    slL.setAttribute('marker-end','url(#ahCG)');
+    g.appendChild(slL);
+    g.appendChild(svgT((driverX+objectX)/2,bvcY-14,'SSD = '+S+' ft','#0D7A4E',9,'middle'));
+    // h1 and h2 markers
+    g.appendChild(svgL(driverX,bvcY,driverX,bvcY-h1*2,'#475569',1.2));
+    g.appendChild(svgC(driverX,bvcY-h1*2,3,'#475569'));
+    g.appendChild(svgT(driverX-6,bvcY-h1-2,'h1','#475569',7,'end'));
+    g.appendChild(svgL(objectX,evcY,objectX,evcY-h2*2,'#475569',1.2));
+    g.appendChild(svgC(objectX,evcY-h2*2,3,'#475569'));
+    g.appendChild(svgT(objectX+6,evcY-h2-2,'h2','#475569',7,'start'));
+  } else {
+    // Sag: headlight beam
+    var driverX=bvcX+10;
+    var beamX=Math.min(bvcX+plotW*0.7,evcX);
+    var beam=svgL(driverX,bvcY+4,beamX,bvcY-20,'#C47D0A',1.5,'6,4');
+    beam.setAttribute('marker-end','url(#ahC)');
+    g.appendChild(beam);
+    g.appendChild(svgT((driverX+beamX)/2+10,bvcY-8,'Headlight beam (2&deg; angle)','#C47D0A',8,'middle'));
+  }
+
+  // BVC, PVI, EVC markers + L arrow
+  [[bvcX,bvcY,'BVC'],[pviX,pviY,'PVI'],[evcX,evcY,'EVC']].forEach(function(pt){
+    g.appendChild(svgC(pt[0],pt[1],4,pt[2]==='PVI'?'#C47D0A':'#1B6AC9'));
+    g.appendChild(svgL(pt[0],pt[1],pt[0],pad+plotH+10,'#DDD8CF',0.8,'3,3'));
+    g.appendChild(svgT(pt[0],pad+plotH+22,pt[2],'#0f2340',9,'middle','600'));
+  });
+
+  // L arrow
+  var lArr=svgL(bvcX,pad+plotH+34,evcX,pad+plotH+34,'#1B6AC9',1.2);
+  lArr.setAttribute('marker-end','url(#ahC)');lArr.setAttribute('marker-start','url(#ahCL)');
+  g.appendChild(lArr);
+  g.appendChild(svgT(pviX,pad+plotH+45,'Required L = '+L.toFixed(0)+' ft (K = '+K.toFixed(1)+')','#1B6AC9',9,'middle','600'));
+
+  // Top label
+  g.appendChild(svgT(pviX,12,type.charAt(0).toUpperCase()+type.slice(1)+' Vertical Curve &mdash; '+V+' mph &mdash; A = '+A.toFixed(2)+'%','#0f2340',10,'middle','500'));
+}
+
+function fv(id){return parseFloat(document.getElementById(id).value);}
+function sv(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+function al(id,cls,msg){var e=document.getElementById(id);if(e)e.innerHTML='<div class="al al-'+cls+'">'+msg+'</div>';}
+function resetAll(){
+  document.querySelectorAll('.fi').forEach(function(e){e.value='';});
+  ['v16_L','v16_K','v16_SSD','v16_gov'].forEach(function(id){sv(id,'&#8212;');});
+  var b=document.getElementById('v16Alert');if(b)b.innerHTML='';
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  var g=document.getElementById('vchkG');if(g){g.innerHTML='';g.appendChild(svgEl16('rect',{x:0,y:0,width:540,height:180,fill:'#F5F2ED'}));var t=svgEl16('text',{x:270,y:90,'font-family':'DM Sans,sans-serif','font-size':11,fill:'#7A90A8','text-anchor':'middle'});t.textContent='Enter values to generate diagram';g.appendChild(t);}
+  sv('diagSub','Enter values to generate diagram');
+}
+(function(){
+  var g=document.getElementById('vchkG');if(!g)return;
+  g.appendChild(svgEl16('rect',{x:0,y:0,width:540,height:180,fill:'#F5F2ED'}));
+  var t=svgEl16('text',{x:270,y:90,'font-family':'DM Sans,sans-serif','font-size':11,fill:'#7A90A8','text-anchor':'middle'});
+  t.textContent='Enter values to generate diagram';g.appendChild(t);
+})();
+
+</script>
+</body></html>

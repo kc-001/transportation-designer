@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transition (Spiral) Curve Length &mdash; TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2340;--navy-light:#234570;--blue:#1B6AC9;--blue-dim:rgba(27,106,201,.10);--blue-border:rgba(27,106,201,.25);--sand:#F5F2ED;--sand2:#EDE9E2;--sand3:#DDD8CF;--text:#0f2340;--text2:#3D5470;--text3:#7A90A8;--ok:#0D7A4E;--ok-dim:rgba(13,122,78,.10);--ok-border:rgba(13,122,78,.25);--warn:#C47D0A;--warn-dim:rgba(196,125,10,.10);--warn-border:rgba(196,125,10,.25);--danger:#B91C1C;--danger-dim:rgba(185,28,28,.10);--danger-border:rgba(185,28,28,.25);--radius:8px;--radius-lg:14px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--shadow-sm:0 1px 3px rgba(15,35,64,.08)}
+html{scroll-behavior:smooth}body{font-family:var(--sans);background:var(--sand);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--sand3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}.nav-logo{width:30px;height:30px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center}.nav-logo svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2}.nav-wordmark{font-family:var(--serif);font-size:15px;color:var(--navy)}.nav-wordmark span{color:var(--blue)}.nav-sub{font-size:11px;color:var(--text3);padding-left:12px;border-left:1px solid var(--sand3)}
+.page-header{background:var(--navy);padding:2.25rem 2rem 2rem;position:relative;overflow:hidden}.phbg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}.phi{max-width:980px;margin:0 auto;position:relative}.page-header h1{font-family:var(--serif);font-size:1.65rem;color:white;letter-spacing:-.02em;line-height:1.2}.page-header p{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;max-width:620px}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.badge{display:inline-flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500}
+.main{max-width:980px;margin:0 auto;padding:1.5rem 2rem 4rem;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start}@media(max-width:780px){.main{grid-template-columns:1fr;padding:1rem}}
+.card{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}.card:last-child{margin-bottom:0}
+.ch{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;gap:10px}.ci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ci svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8}.ct{font-family:var(--serif);font-size:1rem;color:var(--navy)}.cb{padding:1.1rem 1.25rem}
+.sec-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}.sec-lbl::after{content:'';flex:1;height:1px;background:var(--sand3)}
+.fg{margin-bottom:12px}.fl{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}.fh{font-size:10px;color:var(--text3);font-weight:400}.iw{position:relative}
+.fi,.fs{width:100%;font-family:var(--sans);font-size:13px;color:var(--text);background:white;border:1px solid var(--sand3);border-radius:var(--radius);padding:9px 12px;outline:none;transition:border-color .15s}.fi{padding-right:52px}.fi:focus,.fs:focus{border-color:var(--blue-border)}.fi::placeholder{color:var(--text3)}.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:500;pointer-events:none}
+.cb-btn{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;padding:12px;border-radius:var(--radius);border:none;background:var(--navy);color:white;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}.cb-btn:hover{background:var(--navy-light);transform:translateY(-1px)}.cb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.rs-btn{width:100%;font-family:var(--sans);font-size:12px;padding:8px;border-radius:var(--radius);border:1px solid var(--sand3);background:white;color:var(--text3);cursor:pointer;margin-top:8px;transition:all .15s}.rs-btn:hover{background:var(--sand);color:var(--text)}
+.rg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:1rem}.rg3{grid-template-columns:repeat(3,1fr)}
+.rc{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px}.rc.hi{background:var(--blue-dim);border-color:var(--blue-border)}.rc.ok{background:var(--ok-dim);border-color:var(--ok-border)}.rc.wn{background:var(--warn-dim);border-color:var(--warn-border)}.rc.dn{background:var(--danger-dim);border-color:var(--danger-border)}
+.rl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}.rv{font-family:var(--serif);font-size:1.55rem;color:var(--navy);line-height:1}.rc.hi .rv{color:var(--blue)}.rc.ok .rv{color:var(--ok)}.rc.wn .rv{color:var(--warn)}.rc.dn .rv{color:var(--danger)}.rn{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+.al{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-top:10px;border:1px solid transparent;line-height:1.5}.al-wn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn)}.al-ok{background:var(--ok-dim);border-color:var(--ok-border);color:var(--ok)}.al-dn{background:var(--danger-dim);border-color:var(--danger-border);color:var(--danger)}.al-info{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.fb{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:11px 13px;margin-bottom:9px}.fb:last-child{margin-bottom:0}.fn{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.fe{font-size:12.5px;font-weight:500;color:var(--navy);font-family:'Courier New',monospace;line-height:1.6}.fv{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.7}
+.diag-wrap{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}
+.diag-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;justify-content:space-between}.diag-title{font-family:var(--serif);font-size:1rem;color:var(--navy)}.diag-sub{font-size:11px;color:var(--text3)}
+.diag-body{padding:.75rem 1.25rem 1rem}
+table.rt{width:100%;border-collapse:collapse;font-size:12px}.rt th{background:var(--sand);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--sand3)}.rt td{padding:6px 10px;border-bottom:1px solid var(--sand2);color:var(--text)}.rt tr:last-child td{border-bottom:none}.rt tr:hover td{background:var(--sand)}.rt tr.hl td{background:var(--blue-dim);color:var(--blue);font-weight:600}
+.worked-ex{background:var(--sand);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.75}
+.worked-ex code{background:white;border:1px solid var(--sand3);border-radius:4px;padding:8px 12px;display:block;font-family:'Courier New',monospace;font-size:12px;color:var(--navy);margin:8px 0}
+.worked-ex strong{color:var(--navy)}</style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="../../index.html"><div class="nav-logo"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="nav-wordmark">Transportation<span>Designer</span></div></a>
+  <span class="nav-sub">Transition (Spiral) Curve Length</span>
+</nav>
+<div class="page-header"><div class="phbg"></div><div class="phi">
+  <h1>Transition (Spiral) Curve Length</h1><p>Calculate minimum spiral curve length, spiral elements, and superelevation runoff distance</p>
+  <div class="badges"><div class="badge">AASHTO Green Book §3.4.7</div><div class="badge">FDOT Design Standards Index 301</div><div class="badge">FDOT Plans Preparation Manual</div></div>
+</div></div>
+<div class="main">
+  <div><div class="card"><div class="ch"><div class="ci" style="background:var(--navy)"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-6.2-8.56" fill="none"/><polyline points="21 3 21 9 15 9"/></svg></div><span class="ct">Inputs</span></div><div class="cb"><div class="sec-lbl">Horizontal Curve</div><div class="fg"><div class="fl">Design Speed</div><div class="iw"><input class="fi" type="number" id="Vsp" placeholder="e.g. 70" step="any"><span class="iu">mph</span></div></div><div class="fg"><div class="fl">Circular Curve Radius (R)<span class="fh">Measured to CL of inside lane</span></div><div class="iw"><input class="fi" type="number" id="Rsp" placeholder="e.g. 2000" step="any"><span class="iu">ft</span></div></div><div class="sec-lbl">Superelevation</div><div class="fg"><div class="fl">Max Superelevation (e<sub>max</sub>)<span class="fh">FDOT: 0.04–0.10; use 0.08 typical</span></div><div class="iw"><input class="fi" type="number" id="emaxSp" placeholder="0.08" step="any"></div></div><div class="fg"><div class="fl">Normal Crown Slope (e<sub>NC</sub>)<span class="fh">Typically 0.02 (2%)</span></div><div class="iw"><input class="fi" type="number" id="eNCSp" placeholder="0.02" step="any"></div></div><div class="fg"><div class="fl">Number of Lanes (one direction)<span class="fh">Used for runoff length</span></div><div class="iw"><input class="fi" type="number" id="wLn" placeholder="2" step="any"></div></div><div class="fg"><div class="fl">Lane Width</div><div class="iw"><input class="fi" type="number" id="laneW" placeholder="12" step="any"><span class="iu">ft</span></div></div><div class="fg"><div class="fl">Rotation About</div><select class="fs" id="rotSp"><option value="cl">Centerline</option><option value="edge">Pavement Edge (one-sided)</option></select></div><button class="cb-btn" onclick="calculate()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Calculate</button><button class="rs-btn" onclick="resetAll()">Reset</button></div></div></div>
+  <div><div class="diag-wrap"><div class="diag-hdr"><span class="diag-title">Plan View — Spiral Curve Elements</span><span class="diag-sub" id="diagSub">Enter values to generate diagram</span></div><div class="diag-body"><svg id="spiralSvg" viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+<defs>
+  <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#1B6AC9"/></marker>
+  <marker id="ahG" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#0D7A4E"/></marker>
+  <marker id="ahR" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#B91C1C"/></marker>
+</defs>
+<g id="spiralG"></g>
+</svg></div></div><div class="card"><div class="ch"><div class="ci" style="background:var(--blue)"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-6.2-8.56" fill="none"/><polyline points="21 3 21 9 15 9"/></svg></div><span class="ct">Results</span></div><div class="cb"><div class="rg rg3"><div class="rc hi"><div class="rl">Min Spiral Length (L<sub>s</sub>)</div><div class="rv" id="sp_Ls">&#8212;</div><div class="rn" id="sp_Ls_n"></div></div><div class="rc "><div class="rl">Spiral Angle (&theta;<sub>s</sub>)</div><div class="rv" id="sp_theta">&#8212;</div><div class="rn" id="sp_theta_n"></div></div><div class="rc "><div class="rl">Y<sub>s</sub> — Offset at SC</div><div class="rv" id="sp_Ys">&#8212;</div><div class="rn" id="sp_Ys_n"></div></div><div class="rc "><div class="rl">X<sub>s</sub> — Tangent Dist</div><div class="rv" id="sp_Xs">&#8212;</div><div class="rn" id="sp_Xs_n"></div></div><div class="rc "><div class="rl">p — Shift Distance</div><div class="rv" id="sp_k">&#8212;</div><div class="rn" id="sp_k_n"></div></div><div class="rc "><div class="rl">Runoff Rate</div><div class="rv" id="sp_rate">&#8212;</div><div class="rn" id="sp_rate_n"></div></div></div><div class="rg"><div class="rc "><div class="rl">Superelevation Runoff (L<sub>r</sub>)</div><div class="rv" id="sp_Lrun">&#8212;</div><div class="rn">Full width transition length</div></div><div class="rc "><div class="rl">Tangent Runout (L<sub>t</sub>)</div><div class="rv" id="sp_Ltang">&#8212;</div><div class="rn">NC to zero crown</div></div></div><div id="spAlert"></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">Governing Equations</span></div><div class="cb"><div class="fb"><div class="fn">Minimum Spiral Length — Comfort Criterion</div><div class="fe">L<sub>s</sub> = 3.15 &times; V&sup3; / (R &times; C)</div><div class="fv"><b>V</b> = Design speed (mph) &middot; <b>R</b> = Radius (ft) &middot; <b>C</b> = 1.0 ft/s&sup3;</div></div><div class="fb"><div class="fn">Minimum Spiral Length — Runoff Criterion</div><div class="fe">L<sub>s</sub> = (w &times; n &times; |e<sub>d</sub>|) / &Delta;</div><div class="fv"><b>w</b> = Lane width &middot; <b>n</b> = Number of lanes &middot; <b>e<sub>d</sub></b> = e<sub>max</sub> &minus; e<sub>NC</sub> &middot; <b>&Delta;</b> = max relative gradient (~0.45%/ft for 60mph)</div></div><div class="fb"><div class="fn">Spiral Angle at SC</div><div class="fe">&theta;<sub>s</sub> = L<sub>s</sub> / (2R) &times; (180/&pi;)</div><div class="fv">Central angle from TS to SC</div></div><div class="fb"><div class="fn">Spiral Geometry (power series)</div><div class="fe">X<sub>s</sub> = L<sub>s</sub>[1 &minus; &theta;<sub>s</sub>&sup2;/10 + &theta;<sub>s</sub>&sup4;/216]<br>Y<sub>s</sub> = L<sub>s</sub>[&theta;<sub>s</sub>/3 &minus; &theta;<sub>s</sub>&sup3;/42]</div><div class="fv">In radians. Shift p = Y<sub>s</sub> &minus; R(1&minus;cos&theta;<sub>s</sub>)</div></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#6D28D9"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg></div><span class="ct">Worked Example</span></div><div class="cb"><div class="worked-ex"><strong>Problem:</strong> V = 60 mph, R = 1500 ft, e<sub>max</sub> = 0.08, e<sub>NC</sub> = 0.02, 2 lanes @ 12 ft<br><br><strong>Step 1 — Comfort criterion:</strong><br><code>Ls = 3.15 × 60³ / (1500 × 1.0) = 3.15 × 216000 / 1500 = 453.6 ft</code><strong>Step 2 — Runoff criterion:</strong><br><code>Lr = (12 × 2 × |0.08 − 0.02|) / 0.0045 = 1.44 / 0.0045 = 320 ft</code><strong>Result:</strong> Ls = max(453.6, 320, 50) = <strong>453.6 ft</strong> — comfort governs<br><br><em style="font-size:11px">FDOT rounds to next 25 ft: use <strong>475 ft</strong></em></div></div></div></div>
+</div>
+<script>
+
+// AASHTO minimum Ls by speed and emax (simplified — comfort criterion governs for most cases)
+// [speed_mph, Ls_min_ft] for R=500, emax=0.08 reference — actual computed from formula
+var SPIRAL_REF = [
+  [30,75],[35,100],[40,125],[45,150],[50,175],[55,200],[60,225],[65,250],[70,300],[75,350],[80,400]
+];
+
+function calculate(){
+  var V=fv('Vsp'),R=fv('Rsp'),emax=fv('emaxSp'),eNC=fv('eNCSp');
+  var nLn=fv('wLn')||2,lw=fv('laneW')||12;
+  var rot=document.getElementById('rotSp').value;
+  if([V,R,emax].some(isNaN)||R<=0||V<=0){alert('Enter Design Speed, Radius, and e-max.');return;}
+  if(isNaN(eNC))eNC=0.02;
+
+  // Comfort criterion
+  var C=1.0;
+  var Ls_c=3.15*Math.pow(V,3)/(R*C);
+
+  // Runoff criterion (FDOT/AASHTO) — max relative gradient by speed
+  var deltaTable=[[20,0.0074],[25,0.0065],[30,0.0061],[35,0.0056],[40,0.0052],[45,0.0048],[50,0.0045],[55,0.0043],[60,0.0040],[65,0.0038],[70,0.0036],[75,0.0034],[80,0.0032]];
+  var delta=0.0040; // default 60 mph
+  for(var i=0;i<deltaTable.length;i++){if(Math.abs(V-deltaTable[i][0])<3){delta=deltaTable[i][1];break;}}
+  var ed=Math.abs(emax-eNC);
+  var nRotLanes=rot==='cl'?nLn/2:nLn; // lanes rotating
+  var Ls_r=(lw*nRotLanes*ed)/delta;
+
+  var Ls=Math.max(Ls_c,Ls_r,50);
+
+  // Spiral geometry
+  var d2r=Math.PI/180;
+  var theta_s_deg=Ls/(2*R)*(180/Math.PI);
+  var theta_s_rad=theta_s_deg*d2r;
+  var Xs=Ls*(1-Math.pow(theta_s_rad,2)/10+Math.pow(theta_s_rad,4)/216);
+  var Ys=Ls*(theta_s_rad/3-Math.pow(theta_s_rad,3)/42);
+  var p=Ys-R*(1-Math.cos(theta_s_rad)); // shift
+
+  // Superelevation runoff and tangent runout
+  var Lr=Ls_r;
+  var Lt=Lr*(eNC/ed);
+
+  // Runoff rate
+  var rate=ed*100/(Ls/100);
+
+  sv('sp_Ls',Ls.toFixed(1)+' ft'); sv('sp_theta',theta_s_deg.toFixed(3)+'&#176;');
+  sv('sp_Xs',Xs.toFixed(2)+' ft'); sv('sp_Ys',Ys.toFixed(2)+' ft');
+  sv('sp_k',p.toFixed(3)+' ft'); sv('sp_rate',rate.toFixed(3)+'%/sta');
+  sv('sp_Lrun',Lr.toFixed(1)+' ft'); sv('sp_Ltang',Lt.toFixed(1)+' ft');
+
+  var governs=Ls_c>=Ls_r?'Comfort criterion governs (L_comfort='+Ls_c.toFixed(0)+'ft > L_runoff='+Ls_r.toFixed(0)+'ft)':'Runoff criterion governs (L_runoff='+Ls_r.toFixed(0)+'ft > L_comfort='+Ls_c.toFixed(0)+'ft)';
+  var fdot=Math.ceil(Ls/25)*25;
+  al('spAlert','info','&#9432; '+governs+'. FDOT rounds to next 25 ft: use <strong>'+fdot+' ft</strong>.');
+
+  drawSpiral(Ls,R,theta_s_deg,Xs,Ys,p);
+  sv('diagSub','L<sub>s</sub> = '+Ls.toFixed(0)+' ft &middot; &theta;<sub>s</sub> = '+theta_s_deg.toFixed(2)+'&deg; &middot; Y<sub>s</sub> = '+Ys.toFixed(2)+' ft');
+}
+
+function drawSpiral(Ls,R,theta_deg,Xs,Ys,p){
+  var g=document.getElementById('spiralG');g.innerHTML='';
+  var W=540,H=200;
+  g.appendChild(svgRect(0,0,W,H,'#F5F2ED'));
+
+  // Scale: fit the spiral into the diagram
+  // TS at left, spiral curves right and up into circular arc
+  var scale=Math.min(380/Xs,60/Math.max(Ys,5),2.0);
+  var ox=60,oy=H-40; // TS origin
+
+  // Draw tangent line (before TS)
+  g.appendChild(svgLine(20,oy,ox,oy,'#94A3B8',1.5));
+  // Extended tangent (projection)
+  g.appendChild(svgLine(ox,oy,ox+Xs*scale+20,oy,'#DDD8CF',1,'8,4'));
+
+  // Draw spiral curve using parametric approximation
+  var pts=[];var steps=40;
+  for(var i=0;i<=steps;i++){
+    var l=Ls*(i/steps);
+    var theta_l=l*l/(2*R*Ls); // in radians
+    // Fresnel-like coords
+    var xp=l*(1-Math.pow(theta_l,2)/10);
+    var yp=l*(theta_l/3);
+    pts.push([ox+xp*scale, oy-yp*scale]);
+  }
+  var d='M '+pts[0][0]+' '+pts[0][1];
+  for(var j=1;j<pts.length;j++)d+=' L '+pts[j][0]+' '+pts[j][1];
+  var spiral=svgEl('path',{d:d,fill:'none',stroke:'#1B6AC9','stroke-width':2.5});
+  g.appendChild(spiral);
+
+  // Continue with circular arc from SC
+  var scX=pts[pts.length-1][0],scY=pts[pts.length-1][1];
+  var arcSteps=20,arcSpan=30*Math.PI/180; // show 30deg of circular arc
+  var arcPts=[]; var cx_arc=ox+Xs*scale,cy_arc=oy-Ys*scale-R*scale*(1-Math.cos(theta_deg*Math.PI/180));
+  // Simple tangent continuation
+  var ang0=theta_deg*Math.PI/180;
+  for(var k=0;k<=arcSteps;k++){
+    var a=ang0+arcSpan*(k/arcSteps);
+    var xp2=scX+(R*scale)*(Math.sin(a)-Math.sin(ang0));
+    var yp2=scY-(R*scale)*(Math.cos(ang0)-Math.cos(a));
+    arcPts.push([xp2,yp2]);
+  }
+  var d2='M '+arcPts[0][0]+' '+arcPts[0][1];
+  for(var m=1;m<arcPts.length;m++)d2+=' L '+arcPts[m][0]+' '+arcPts[m][1];
+  g.appendChild(svgEl('path',{d:d2,fill:'none',stroke:'#1B6AC9','stroke-width':2,'stroke-dasharray':'8,4'}));
+
+  // Xs dimension
+  g.appendChild(svgLine(ox,oy+15,ox+Xs*scale,oy+15,'#1B6AC9',1.2));
+  g.appendChild(svgTxt((ox+ox+Xs*scale)/2,oy+26,'Xs = '+Xs.toFixed(1)+' ft','#1B6AC9',9,'middle'));
+
+  // Ys dimension
+  var scPt=pts[pts.length-1];
+  g.appendChild(svgLine(scPt[0]+8,oy,scPt[0]+8,scPt[1],'#0D7A4E',1.2));
+  g.appendChild(svgTxt(scPt[0]+22,(oy+scPt[1])/2,'Ys = '+Ys.toFixed(1)+' ft','#0D7A4E',9,'start'));
+
+  // Labels
+  g.appendChild(svgTxt(ox-2,oy-8,'TS','#0f2340',9,'end','600'));
+  g.appendChild(svgTxt(scPt[0],scPt[1]-10,'SC','#0f2340',9,'middle','600'));
+  g.appendChild(svgCirc(ox,oy,4,'#0f2340'));
+  g.appendChild(svgCirc(scPt[0],scPt[1],4,'#1B6AC9'));
+
+  // Ls label along curve midpoint
+  var mid=pts[Math.floor(pts.length/2)];
+  g.appendChild(svgTxt(mid[0]-12,mid[1]-10,'Ls = '+Ls.toFixed(0)+' ft','#1B6AC9',9,'middle','600'));
+
+  // Legend
+  g.appendChild(svgLine(W-120,H-22,W-100,H-22,'#1B6AC9',2.5));g.appendChild(svgTxt(W-95,H-18,'Spiral','#1B6AC9',9,'start'));
+  g.appendChild(svgLine(W-120,H-10,W-100,H-10,'#1B6AC9',2,'8,4'));g.appendChild(svgTxt(W-95,H-6,'Circular Arc','#1B6AC9',9,'start'));
+}
+
+// SVG helpers (shared)
+var NS='http://www.w3.org/2000/svg';
+function svgEl(tag,a){var e=document.createElementNS(NS,tag);Object.keys(a).forEach(function(k){e.setAttribute(k,a[k]);});return e;}
+function svgRect(x,y,w,h,fill,rx){return svgEl('rect',{x:x,y:y,width:Math.max(0,w),height:h,fill:fill,rx:rx||0});}
+function svgLine(x1,y1,x2,y2,stroke,sw,da){var a={x1:x1,y1:y1,x2:x2,y2:y2,stroke:stroke,'stroke-width':sw||1};if(da)a['stroke-dasharray']=da;return svgEl('line',a);}
+function svgCirc(cx,cy,r,fill){return svgEl('circle',{cx:cx,cy:cy,r:r,fill:fill});}
+function svgTxt(x,y,str,fill,sz,anchor,weight){var e=svgEl('text',{x:x,y:y,'font-family':'DM Sans,sans-serif','font-size':sz||10,fill:fill||'#0f2340','text-anchor':anchor||'middle'});if(weight)e.setAttribute('font-weight',weight);e.textContent=str;return e;}
+function fv(id){return parseFloat(document.getElementById(id).value);}
+function sv(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+function al(id,cls,msg){var e=document.getElementById(id);if(e)e.innerHTML='<div class="al al-'+cls+'">'+msg+'</div>';}
+function resetAll(){document.querySelectorAll('.fi').forEach(function(e){e.value='';});['sp_Ls','sp_theta','sp_Xs','sp_Ys','sp_k','sp_rate','sp_Lrun','sp_Ltang'].forEach(function(id){sv(id,'&#8212;');});var b=document.getElementById('spAlert');if(b)b.innerHTML='';var g=document.getElementById('spiralG');if(g){g.innerHTML='';g.appendChild(svgRect(0,0,540,200,'#F5F2ED'));g.appendChild(svgTxt(270,100,'Enter values to generate diagram','#7A90A8',11));}sv('diagSub','Enter values to generate diagram');}
+// init diagram placeholder
+(function(){var g=document.getElementById('spiralG');if(g){g.appendChild(svgRect(0,0,540,200,'#F5F2ED'));g.appendChild(svgTxt(270,100,'Enter values to generate diagram','#7A90A8',11));}})();
+
+</script>
+</body></html>

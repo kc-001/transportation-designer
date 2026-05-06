@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vertical Curve Design (Summit &amp; Sag) &mdash; TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2340;--navy-light:#234570;--blue:#1B6AC9;--blue-dim:rgba(27,106,201,.10);--blue-border:rgba(27,106,201,.25);--sand:#F5F2ED;--sand2:#EDE9E2;--sand3:#DDD8CF;--text:#0f2340;--text2:#3D5470;--text3:#7A90A8;--ok:#0D7A4E;--ok-dim:rgba(13,122,78,.10);--ok-border:rgba(13,122,78,.25);--warn:#C47D0A;--warn-dim:rgba(196,125,10,.10);--warn-border:rgba(196,125,10,.25);--danger:#B91C1C;--danger-dim:rgba(185,28,28,.10);--danger-border:rgba(185,28,28,.25);--radius:8px;--radius-lg:14px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--shadow-sm:0 1px 3px rgba(15,35,64,.08)}
+html{scroll-behavior:smooth}body{font-family:var(--sans);background:var(--sand);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--sand3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}.nav-logo{width:30px;height:30px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center}.nav-logo svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2}.nav-wordmark{font-family:var(--serif);font-size:15px;color:var(--navy)}.nav-wordmark span{color:var(--blue)}.nav-sub{font-size:11px;color:var(--text3);padding-left:12px;border-left:1px solid var(--sand3)}
+.page-header{background:var(--navy);padding:2.25rem 2rem 2rem;position:relative;overflow:hidden}.phbg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}.phi{max-width:980px;margin:0 auto;position:relative}.page-header h1{font-family:var(--serif);font-size:1.65rem;color:white;letter-spacing:-.02em;line-height:1.2}.page-header p{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;max-width:620px}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.badge{display:inline-flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500}
+.main{max-width:980px;margin:0 auto;padding:1.5rem 2rem 4rem;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start}@media(max-width:780px){.main{grid-template-columns:1fr;padding:1rem}}
+.card{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}.card:last-child{margin-bottom:0}
+.ch{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;gap:10px}.ci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ci svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8}.ct{font-family:var(--serif);font-size:1rem;color:var(--navy)}.cb{padding:1.1rem 1.25rem}
+.sec-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}.sec-lbl::after{content:'';flex:1;height:1px;background:var(--sand3)}
+.fg{margin-bottom:12px}.fl{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}.fh{font-size:10px;color:var(--text3);font-weight:400}.iw{position:relative}
+.fi,.fs{width:100%;font-family:var(--sans);font-size:13px;color:var(--text);background:white;border:1px solid var(--sand3);border-radius:var(--radius);padding:9px 12px;outline:none;transition:border-color .15s}.fi{padding-right:52px}.fi:focus,.fs:focus{border-color:var(--blue-border)}.fi::placeholder{color:var(--text3)}.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:500;pointer-events:none}
+.cb-btn{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;padding:12px;border-radius:var(--radius);border:none;background:var(--navy);color:white;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}.cb-btn:hover{background:var(--navy-light);transform:translateY(-1px)}.cb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.rs-btn{width:100%;font-family:var(--sans);font-size:12px;padding:8px;border-radius:var(--radius);border:1px solid var(--sand3);background:white;color:var(--text3);cursor:pointer;margin-top:8px;transition:all .15s}.rs-btn:hover{background:var(--sand);color:var(--text)}
+.rg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:1rem}.rg3{grid-template-columns:repeat(3,1fr)}
+.rc{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px}.rc.hi{background:var(--blue-dim);border-color:var(--blue-border)}.rc.ok{background:var(--ok-dim);border-color:var(--ok-border)}.rc.wn{background:var(--warn-dim);border-color:var(--warn-border)}.rc.dn{background:var(--danger-dim);border-color:var(--danger-border)}
+.rl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}.rv{font-family:var(--serif);font-size:1.55rem;color:var(--navy);line-height:1}.rc.hi .rv{color:var(--blue)}.rc.ok .rv{color:var(--ok)}.rc.wn .rv{color:var(--warn)}.rc.dn .rv{color:var(--danger)}.rn{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+.al{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-top:10px;border:1px solid transparent;line-height:1.5}.al-wn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn)}.al-ok{background:var(--ok-dim);border-color:var(--ok-border);color:var(--ok)}.al-dn{background:var(--danger-dim);border-color:var(--danger-border);color:var(--danger)}.al-info{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.fb{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:11px 13px;margin-bottom:9px}.fb:last-child{margin-bottom:0}.fn{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.fe{font-size:12.5px;font-weight:500;color:var(--navy);font-family:'Courier New',monospace;line-height:1.6}.fv{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.7}
+.diag-wrap{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}
+.diag-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;justify-content:space-between}.diag-title{font-family:var(--serif);font-size:1rem;color:var(--navy)}.diag-sub{font-size:11px;color:var(--text3)}
+.diag-body{padding:.75rem 1.25rem 1rem}
+table.rt{width:100%;border-collapse:collapse;font-size:12px}.rt th{background:var(--sand);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--sand3)}.rt td{padding:6px 10px;border-bottom:1px solid var(--sand2);color:var(--text)}.rt tr:last-child td{border-bottom:none}.rt tr:hover td{background:var(--sand)}.rt tr.hl td{background:var(--blue-dim);color:var(--blue);font-weight:600}
+.worked-ex{background:var(--sand);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.75}
+.worked-ex code{background:white;border:1px solid var(--sand3);border-radius:4px;padding:8px 12px;display:block;font-family:'Courier New',monospace;font-size:12px;color:var(--navy);margin:8px 0}
+.worked-ex strong{color:var(--navy)}</style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="../../index.html"><div class="nav-logo"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="nav-wordmark">Transportation<span>Designer</span></div></a>
+  <span class="nav-sub">Vertical Curve Design (Summit &amp; Sag)</span>
+</nav>
+<div class="page-header"><div class="phbg"></div><div class="phi">
+  <h1>Vertical Curve Design (Summit &amp; Sag)</h1><p>Compute K-values, BVC/EVC stationing, elevations, and high/low point for crest and sag vertical curves</p>
+  <div class="badges"><div class="badge">AASHTO Green Book §3.3</div><div class="badge">FDOT Design Standards</div><div class="badge">FDOT Plans Preparation Manual Vol. 1</div></div>
+</div></div>
+<div class="main">
+  <div><div class="card"><div class="ch"><div class="ci" style="background:var(--navy)"><svg viewBox="0 0 24 24"><polyline points="3 17 8 8 14 14 19 6"/></svg></div><span class="ct">Inputs</span></div><div class="cb"><div class="fg"><div class="fl">Curve Type</div><select class="fs" id="vcType"><option value="crest">Crest (Summit)</option><option value="sag">Sag</option></select></div><div class="sec-lbl">Grades</div><div class="fg"><div class="fl">Grade 1 (g1)<span class="fh">Approach grade — enter as percent</span></div><div class="iw"><input class="fi" id="g1v" placeholder="-2.5" step="any" type="number"><span class="iu">%</span></div></div><div class="fg"><div class="fl">Grade 2 (g2)<span class="fh">Departure grade — enter as percent</span></div><div class="iw"><input class="fi" id="g2v" placeholder="1.5" step="any" type="number"><span class="iu">%</span></div></div><div class="sec-lbl">Curve Length</div><div class="fg"><div class="fl">Curve Length (L)<span class="fh">Enter proposed length to check K-value</span></div><div class="iw"><input class="fi" type="number" id="Lvc" placeholder="e.g. 600" step="any"><span class="iu">ft</span></div></div><div class="sec-lbl">Stationing (optional)</div><div class="fg"><div class="fl">PVI Station<span class="fh">Decimal station for BVC/EVC output</span></div><div class="iw"><input class="fi" id="PVIs" placeholder="e.g. 1000.00" step="any" type="number"><span class="iu">ft</span></div></div><div class="fg"><div class="fl">PVI Elevation</div><div class="iw"><input class="fi" id="PVIe" placeholder="e.g. 100.00" step="any" type="number"><span class="iu">ft</span></div></div><div class="sec-lbl">Design Speed Check</div><div class="fg"><div class="fl">Design Speed<span class="fh">For minimum K-value lookup</span></div><div class="iw"><input class="fi" type="number" id="Vkv" placeholder="e.g. 60" step="any"><span class="iu">mph</span></div></div><button class="cb-btn" onclick="calculate()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Calculate</button><button class="rs-btn" onclick="resetAll()">Reset</button></div></div></div>
+  <div><div class="diag-wrap"><div class="diag-hdr"><span class="diag-title">Vertical Curve Profile</span><span class="diag-sub" id="diagSub">Enter grades and length to generate profile</span></div><div class="diag-body"><svg id="vcSvg" viewBox="0 0 540 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block"><defs><marker id="ahV" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#1B6AC9"/></marker><marker id="ahVL" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path d="M7,0 L7,7 L0,3.5 z" fill="#1B6AC9"/></marker></defs><g id="vcG"></g></svg></div></div><div class="card"><div class="ch"><div class="ci" style="background:var(--blue)"><svg viewBox="0 0 24 24"><polyline points="3 17 8 8 14 14 19 6"/></svg></div><span class="ct">Results</span></div><div class="cb"><div class="rg rg3"><div class="rc "><div class="rl">Algebraic Diff (A)</div><div class="rv" id="vc_A">&#8212;</div><div class="rn" id="vc_A_n"></div></div><div class="rc hi"><div class="rl">K-Value</div><div class="rv" id="vc_K">&#8212;</div><div class="rn" id="vc_K_n"></div></div><div class="rc "><div class="rl">Min K Required</div><div class="rv" id="vc_Kmin">&#8212;</div><div class="rn" id="vc_Kmin_n"></div></div><div class="rc "><div class="rl">BVC Station</div><div class="rv" id="vc_BVC">&#8212;</div><div class="rn" id="vc_BVC_n"></div></div><div class="rc "><div class="rl">EVC Station</div><div class="rv" id="vc_EVC">&#8212;</div><div class="rn" id="vc_EVC_n"></div></div><div class="rc "><div class="rl">BVC Elevation</div><div class="rv" id="vc_Be">&#8212;</div><div class="rn" id="vc_Be_n"></div></div><div class="rc "><div class="rl">EVC Elevation</div><div class="rv" id="vc_Ee">&#8212;</div><div class="rn" id="vc_Ee_n"></div></div><div class="rc "><div class="rl">PVI Elevation</div><div class="rv" id="vc_PVIe_disp">&#8212;</div><div class="rn" id="vc_PVIe_disp_n"></div></div><div class="rc "><div class="rl">High/Low Point Sta</div><div class="rv" id="vc_hl">&#8212;</div><div class="rn" id="vc_hl_n"></div></div><div class="rc "><div class="rl">High/Low Elevation</div><div class="rv" id="vc_he">&#8212;</div><div class="rn" id="vc_he_n"></div></div></div><div id="vcAlert"></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#C47D0A"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">AASHTO K-Value Reference</span></div><div class="cb"><div style="overflow-x:auto"><table class="rt"><thead><tr><th>Speed (mph)</th><th>K Crest (min)</th><th>K Sag (min)</th></tr></thead><tbody><tr id="kr30"><td>30 mph</td><td>19</td><td>37</td></tr><tr id="kr35"><td>35 mph</td><td>29</td><td>49</td></tr><tr id="kr40"><td>40 mph</td><td>44</td><td>64</td></tr><tr id="kr45"><td>45 mph</td><td>61</td><td>79</td></tr><tr id="kr50"><td>50 mph</td><td>84</td><td>96</td></tr><tr id="kr55"><td>55 mph</td><td>114</td><td>115</td></tr><tr id="kr60"><td>60 mph</td><td>151</td><td>136</td></tr><tr id="kr65"><td>65 mph</td><td>193</td><td>157</td></tr><tr id="kr70"><td>70 mph</td><td>247</td><td>181</td></tr><tr id="kr75"><td>75 mph</td><td>312</td><td>206</td></tr><tr id="kr80"><td>80 mph</td><td>384</td><td>231</td></tr></tbody></table></div></div></div><div class="card"><div class="ch"><div class="ci" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">Governing Equations</span></div><div class="cb"><div class="fb"><div class="fn">K-Value</div><div class="fe">K = L / |A|</div><div class="fv"><b>L</b> = Curve length (ft) &middot; <b>A</b> = |g2 &minus; g1| (%)</div></div><div class="fb"><div class="fn">BVC &amp; EVC Stationing</div><div class="fe">BVC = PVI &minus; L/2 &nbsp;&nbsp; EVC = PVI + L/2</div><div class="fv">Station arithmetic</div></div><div class="fb"><div class="fn">BVC &amp; EVC Elevation</div><div class="fe">BVC elev = PVI elev &minus; (g1/100) &times; (L/2)<br>EVC elev = PVI elev + (g2/100) &times; (L/2)</div><div class="fv">Grade applied from PVI</div></div><div class="fb"><div class="fn">Elevation at Distance x from BVC</div><div class="fe">y = BVC_elev + (g1/100)&times;x + (A/(200L))&times;x&sup2;</div><div class="fv">Parabolic equation</div></div><div class="fb"><div class="fn">High/Low Point (zero-slope)</div><div class="fe">x<sub>HL</sub> = &minus;g1 &times; L / A &nbsp;&nbsp;(0 &lt; x &lt; L)</div><div class="fv">Only valid when high/low is within curve limits</div></div></div></div></div>
+</div>
+<script>
+
+var KCREST={30:19,35:29,40:44,45:61,50:84,55:114,60:151,65:193,70:247,75:312,80:384}, KSAG={30:37,35:49,40:64,45:79,50:96,55:115,60:136,65:157,70:181,75:206,80:231};
+var NS='http://www.w3.org/2000/svg';
+function svgEl(tag,a){var e=document.createElementNS(NS,tag);Object.keys(a).forEach(function(k){e.setAttribute(k,a[k]);});return e;}
+function svgRect(x,y,w,h,fill){return svgEl('rect',{x:x,y:y,width:Math.max(0,w),height:h,fill:fill});}
+function svgLine(x1,y1,x2,y2,stroke,sw,da){var a={x1:x1,y1:y1,x2:x2,y2:y2,stroke:stroke,'stroke-width':sw||1};if(da)a['stroke-dasharray']=da;return svgEl('line',a);}
+function svgCirc(cx,cy,r,fill){return svgEl('circle',{cx:cx,cy:cy,r:r,fill:fill});}
+function svgTxt(x,y,str,fill,sz,anchor,weight){var e=svgEl('text',{x:x,y:y,'font-family':'DM Sans,sans-serif','font-size':sz||10,fill:fill||'#0f2340','text-anchor':anchor||'middle'});if(weight)e.setAttribute('font-weight',weight);e.textContent=str;return e;}
+function svgPath(d,fill,stroke,sw){return svgEl('path',{d:d,fill:fill||'none',stroke:stroke||'#1B6AC9','stroke-width':sw||2});}
+
+function calculate(){
+  var type=document.getElementById('vcType').value;
+  var g1=fv('g1v'),g2=fv('g2v'),L=fv('Lvc');
+  var pviS=fv('PVIs'),pviE=fv('PVIe'),Vk=Math.round(fv('Vkv')/5)*5;
+  if([g1,g2,L].some(isNaN)||L<=0){alert('Enter both grades and curve length.');return;}
+
+  var A=g2-g1, Aabs=Math.abs(A), K=L/Aabs;
+  sv('vc_A',Aabs.toFixed(3)+'%'); sv('vc_K',K.toFixed(1)+' ft/%');
+
+  var kRef=(type==='crest'?KCREST:KSAG)[Vk];
+  if(kRef){sv('vc_Kmin',kRef+' ft/%'); }
+  else sv('vc_Kmin','Select speed');
+
+  // Stationing
+  if(!isNaN(pviS)){
+    var bvcS=pviS-L/2,evcS=pviS+L/2;
+    sv('vc_BVC',fmtSta(bvcS)); sv('vc_EVC',fmtSta(evcS));
+  }
+
+  // Elevations
+  if(!isNaN(pviE)&&!isNaN(pviS)){
+    var bvcE=pviE-(g1/100)*(L/2),evcE=pviE+(g2/100)*(L/2);
+    sv('vc_Be',bvcE.toFixed(3)+' ft'); sv('vc_Ee',evcE.toFixed(3)+' ft');
+    sv('vc_PVIe_disp',pviE.toFixed(3)+' ft');
+
+    // High/Low point
+    if(A!==0){
+      var xHL=(-g1*L)/A;
+      if(xHL>0&&xHL<L){
+        var hlE=bvcE+(g1/100)*xHL+(A/(200*L))*xHL*xHL;
+        sv('vc_hl',!isNaN(pviS)?fmtSta(pviS-L/2+xHL):xHL.toFixed(1)+' ft from BVC');
+        sv('vc_he',hlE.toFixed(3)+' ft');
+      } else {sv('vc_hl','Outside curve'); sv('vc_he','&#8212;');}
+    }
+
+    drawVC(type,g1,g2,L,pviE,K,bvcE,evcE,pviS);
+  } else {
+    drawVCNoElev(type,g1,g2,L,K);
+  }
+
+  // K compliance
+  hlRows(Vk);
+  if(kRef){
+    var ok=K>=kRef;
+    al('vcAlert',ok?'ok':'dn',ok?'&#10003; K = '+K.toFixed(1)+' meets AASHTO minimum K = '+kRef+' for '+Vk+' mph '+type+' curve':'&#10007; K = '+K.toFixed(1)+' is below minimum K = '+kRef+' for '+Vk+' mph. Required L = '+(kRef*Aabs).toFixed(0)+' ft.');
+  }
+}
+
+function drawVC(type,g1,g2,L,pviE,K,bvcE,evcE,pviS){
+  var g=document.getElementById('vcG');g.innerHTML='';
+  var W=540,H=180,pad=50,plotW=W-2*pad;
+  g.appendChild(svgRect(0,0,W,H,'#F5F2ED'));
+
+  // Compute profile points
+  var nPts=60, pts=[];
+  var elev_range_raw=[];
+  for(var i=0;i<=nPts;i++){
+    var x=L*(i/nPts);
+    var A=g2-g1;
+    var y=bvcE+(g1/100)*x+(A/(200*L))*x*x;
+    elev_range_raw.push(y); pts.push([x,y]);
+  }
+  // Add grade lines
+  var tangent_bvc_end=bvcE+(g1/100)*L;
+  var tangent_evc_start=evcE-(g2/100)*L;
+  elev_range_raw.push(tangent_bvc_end,tangent_evc_start,pviE);
+
+  var eMin=Math.min.apply(null,elev_range_raw);
+  var eMax=Math.max.apply(null,elev_range_raw);
+  var eSpan=eMax-eMin||1;
+  var margin=0.15;
+  var plotH=H-50;
+
+  function toY(e){return pad+plotH*(1-(e-eMin+eSpan*margin)/(eSpan*(1+2*margin)));}
+  function toX(x){return pad+plotW*(x/L);}
+
+  // Grade tangent lines (dashed)
+  var bvcY=toY(bvcE),pviY=toY(pviE),evcY=toY(evcE);
+  var pviX=toX(L/2);
+  g.appendChild(svgLine(pad-20,toY(bvcE+(g1/100)*(-L*0.15)),pad,bvcY,'#DDD8CF',1,'6,4'));
+  g.appendChild(svgLine(pad,bvcY,pviX,pviY,'#94A3B8',1,'8,4'));
+  g.appendChild(svgLine(pviX,pviY,pad+plotW+20,toY(evcE+(g2/100)*(L*0.15)),'#94A3B8',1,'8,4'));
+
+  // Parabolic curve
+  var d='M '+toX(pts[0][0])+' '+toY(pts[0][1]);
+  for(var i=1;i<pts.length;i++)d+=' L '+toX(pts[i][0])+' '+toY(pts[i][1]);
+  var crv=svgEl('path',{d:d,fill:'none',stroke:'#1B6AC9','stroke-width':2.5});
+  g.appendChild(crv);
+
+  // Fill under crest / above sag
+  var fillColor=type==='crest'?'rgba(27,106,201,.07)':'rgba(13,122,78,.07)';
+  var fillD=d+' L '+toX(L)+' '+(pad+plotH)+' L '+pad+' '+(pad+plotH)+' Z';
+  g.appendChild(svgEl('path',{d:fillD,fill:fillColor,stroke:'none'}));
+
+  // BVC, PVI, EVC markers
+  [[pad,bvcY,'BVC'],[pviX,pviY,'PVI'],[pad+plotW,evcY,'EVC']].forEach(function(pt){
+    g.appendChild(svgCirc(pt[0],pt[1],4,pt[2]==='PVI'?'#C47D0A':'#1B6AC9'));
+    g.appendChild(svgLine(pt[0],pt[1],pt[0],pad+plotH,'#DDD8CF',0.8,'4,3'));
+    g.appendChild(svgTxt(pt[0],pad+plotH+12,pt[2],'#0f2340',9,'middle','600'));
+    var elv=pt[2]==='BVC'?bvcE:pt[2]==='EVC'?evcE:pviE;
+    g.appendChild(svgTxt(pt[0],pt[1]-8,elv.toFixed(2),'#3D5470',8,'middle'));
+  });
+
+  // High/low point
+  var A2=g2-g1;
+  if(A2!==0){var xHL=(-g1*L)/A2;
+    if(xHL>0&&xHL<L){
+      var hlE=bvcE+(g1/100)*xHL+(A2/(200*L))*xHL*xHL;
+      g.appendChild(svgCirc(toX(xHL),toY(hlE),5,'#B91C1C'));
+      g.appendChild(svgTxt(toX(xHL),toY(hlE)-10,type==='crest'?'High Pt':'Low Pt','#B91C1C',8,'middle','600'));
+    }
+  }
+
+  // Grade labels
+  g.appendChild(svgTxt(pad+plotW*0.15,toY(bvcE+(g1/100)*(L*0.15))-8,'g1='+(g1>=0?'+':'')+g1+'%','#475569',8,'middle'));
+  g.appendChild(svgTxt(pad+plotW*0.85,toY(evcE+(g2/100)*(L*0.15*(g2>0?-1:1)))-8,'g2='+(g2>=0?'+':'')+g2+'%','#475569',8,'middle'));
+
+  // K label
+  g.appendChild(svgTxt(pviX,14,'K = '+K.toFixed(1)+'  |  L = '+L.toFixed(0)+' ft  |  A = '+Math.abs(A2).toFixed(2)+'%','#1B6AC9',10,'middle','600'));
+  sv('diagSub','K = '+K.toFixed(1)+' &middot; L = '+L.toFixed(0)+' ft &middot; A = '+Math.abs(A2).toFixed(2)+'%');
+}
+
+function drawVCNoElev(type,g1,g2,L,K){
+  var g=document.getElementById('vcG');g.innerHTML='';
+  var W=540,H=180;
+  g.appendChild(svgRect(0,0,W,H,'#F5F2ED'));
+  var pad=50,plotW=W-2*pad,plotH=H-50,midY=pad+plotH/2;
+  // Simple schematic
+  var bvcY=type==='crest'?midY+20:midY-20;
+  var pviY=type==='crest'?midY-30:midY+30;
+  var evcY=type==='crest'?midY+20:midY-20;
+  var A2=g2-g1;
+  var bvcX=pad,pviX=pad+plotW/2,evcX=pad+plotW;
+  g.appendChild(svgLine(bvcX,bvcY,pviX,pviY,'#94A3B8',1,'8,4'));
+  g.appendChild(svgLine(pviX,pviY,evcX,evcY,'#94A3B8',1,'8,4'));
+  var d='M '+bvcX+' '+bvcY+' Q '+pviX+' '+(type==='crest'?pviY-20:pviY+20)+' '+evcX+' '+evcY;
+  g.appendChild(svgEl('path',{d:d,fill:'none',stroke:'#1B6AC9','stroke-width':2.5}));
+  [[bvcX,bvcY,'BVC'],[pviX,pviY,'PVI'],[evcX,evcY,'EVC']].forEach(function(pt){
+    g.appendChild(svgCirc(pt[0],pt[1],4,pt[2]==='PVI'?'#C47D0A':'#1B6AC9'));
+    g.appendChild(svgTxt(pt[0],pt[1]+(type==='crest'?14:-16),pt[2],'#0f2340',9,'middle','600'));
+  });
+  g.appendChild(svgTxt(pviX,14,'K = '+K.toFixed(1)+'  |  L = '+L.toFixed(0)+' ft  |  A = '+Math.abs(A2).toFixed(2)+'%','#1B6AC9',10,'middle','600'));
+  g.appendChild(svgTxt(bvcX+plotW*0.18,bvcY+(type==='crest'?-10:12),'g1='+(g1>=0?'+':'')+g1+'%','#475569',8,'middle'));
+  g.appendChild(svgTxt(evcX-plotW*0.18,evcY+(type==='crest'?-10:12),'g2='+(g2>=0?'+':'')+g2+'%','#475569',8,'middle'));
+  sv('diagSub','K = '+K.toFixed(1)+' &middot; L = '+L.toFixed(0)+' ft &middot; Enter PVI station &amp; elevation for full profile');
+}
+
+function hlRows(Vk){
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  var r=document.getElementById('kr'+Vk);if(r)r.classList.add('hl');
+}
+function fmtSta(s){var n=Math.floor(s/100),r=(s%100);return n+'+'+(r<10?'0':'')+r.toFixed(2);}
+function fv(id){return parseFloat(document.getElementById(id).value);}
+function sv(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+function al(id,cls,msg){var e=document.getElementById(id);if(e)e.innerHTML='<div class="al al-'+cls+'">'+msg+'</div>';}
+function resetAll(){
+  document.querySelectorAll('.fi').forEach(function(e){e.value='';});
+  ['vc_A','vc_K','vc_Kmin','vc_BVC','vc_EVC','vc_Be','vc_Ee','vc_PVIe_disp','vc_hl','vc_he'].forEach(function(id){sv(id,'&#8212;');});
+  var b=document.getElementById('vcAlert');if(b)b.innerHTML='';
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  var g=document.getElementById('vcG');if(g){g.innerHTML='';g.appendChild(svgEl('rect',{x:0,y:0,width:540,height:180,fill:'#F5F2ED'}));var t=svgEl('text',{x:270,y:90,'font-family':'DM Sans,sans-serif','font-size':11,fill:'#7A90A8','text-anchor':'middle'});t.textContent='Enter grades and length to generate profile';g.appendChild(t);}
+  sv('diagSub','Enter grades and length to generate profile');
+}
+(function(){
+  var g=document.getElementById('vcG');if(!g)return;
+  g.appendChild(svgEl('rect',{x:0,y:0,width:540,height:180,fill:'#F5F2ED'}));
+  var t=svgEl('text',{x:270,y:90,'font-family':'DM Sans,sans-serif','font-size':11,fill:'#7A90A8','text-anchor':'middle'});
+  t.textContent='Enter grades and length to generate profile';g.appendChild(t);
+})();
+
+</script>
+</body></html>

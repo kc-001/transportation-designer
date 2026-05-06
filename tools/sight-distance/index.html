@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sight Distance Calculator — TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2340;--navy-light:#234570;--blue:#1B6AC9;--blue-dim:rgba(27,106,201,.10);--blue-border:rgba(27,106,201,.25);--sand:#F5F2ED;--sand2:#EDE9E2;--sand3:#DDD8CF;--text:#0f2340;--text2:#3D5470;--text3:#7A90A8;--ok:#0D7A4E;--ok-dim:rgba(13,122,78,.10);--ok-border:rgba(13,122,78,.25);--warn:#C47D0A;--warn-dim:rgba(196,125,10,.10);--warn-border:rgba(196,125,10,.25);--danger:#B91C1C;--danger-dim:rgba(185,28,28,.10);--danger-border:rgba(185,28,28,.25);--radius:8px;--radius-lg:14px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--shadow-sm:0 1px 3px rgba(15,35,64,.08)}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--sand);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--sand3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}.nav-logo{width:30px;height:30px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center}.nav-logo svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2}.nav-wordmark{font-family:var(--serif);font-size:15px;color:var(--navy)}.nav-wordmark span{color:var(--blue)}.nav-sub{font-size:11px;color:var(--text3);padding-left:12px;border-left:1px solid var(--sand3)}
+.page-header{background:var(--navy);padding:2.25rem 2rem 2rem;position:relative;overflow:hidden}.phbg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}.phi{max-width:980px;margin:0 auto;position:relative}.page-header h1{font-family:var(--serif);font-size:1.65rem;color:white;letter-spacing:-.02em;line-height:1.2}.page-header p{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;max-width:600px}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.badge{display:inline-flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500}
+.main{max-width:980px;margin:0 auto;padding:1.5rem 2rem 4rem;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:780px){.main{grid-template-columns:1fr;padding:1rem}}
+.card{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}.card:last-child{margin-bottom:0}
+.ch{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;gap:10px}.ci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ci svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8}.ct{font-family:var(--serif);font-size:1rem;color:var(--navy)}.cb{padding:1.1rem 1.25rem}
+.type-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:1.1rem}
+.type-tab{padding:8px 6px;border-radius:var(--radius);border:1px solid var(--sand3);background:var(--sand);color:var(--text2);cursor:pointer;text-align:center;font-family:var(--sans);font-size:11px;font-weight:500;line-height:1.4;transition:all .15s}.type-tab:hover{background:var(--sand2)}.type-tab.active{background:var(--navy);border-color:var(--navy);color:white}
+.tab-code{font-size:13px;font-weight:700;display:block;color:inherit}.type-tab.active .tab-code{color:#7ab8f5}
+.sec-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}.sec-lbl::after{content:'';flex:1;height:1px;background:var(--sand3)}
+.fg{margin-bottom:12px}.fl{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}.fh{font-size:10px;color:var(--text3);font-weight:400}.iw{position:relative}
+.fi,.fs{width:100%;font-family:var(--sans);font-size:13px;color:var(--text);background:white;border:1px solid var(--sand3);border-radius:var(--radius);padding:9px 12px;outline:none;transition:border-color .15s}.fi{padding-right:50px}.fi:focus,.fs:focus{border-color:var(--blue-border)}.fi::placeholder{color:var(--text3)}.iu{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:500;pointer-events:none}
+.cb-btn{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;padding:12px;border-radius:var(--radius);border:none;background:var(--navy);color:white;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}.cb-btn:hover{background:var(--navy-light);transform:translateY(-1px)}.cb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.rs-btn{width:100%;font-family:var(--sans);font-size:12px;padding:8px;border-radius:var(--radius);border:1px solid var(--sand3);background:white;color:var(--text3);cursor:pointer;margin-top:8px;transition:all .15s}.rs-btn:hover{background:var(--sand);color:var(--text)}
+.rg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:1rem}.rg3{grid-template-columns:repeat(3,1fr)}
+.rc{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px}.rc.hi{background:var(--blue-dim);border-color:var(--blue-border)}.rc.ok{background:var(--ok-dim);border-color:var(--ok-border)}.rc.wn{background:var(--warn-dim);border-color:var(--warn-border)}
+.rl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}.rv{font-family:var(--serif);font-size:1.55rem;color:var(--navy);line-height:1}.rc.hi .rv{color:var(--blue)}.rc.ok .rv{color:var(--ok)}.rc.wn .rv{color:var(--warn)}.rn{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+.al{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-top:10px;border:1px solid transparent;line-height:1.5}.al-wn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn)}.al-ok{background:var(--ok-dim);border-color:var(--ok-border);color:var(--ok)}.al-info{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.fb{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:11px 13px;margin-bottom:9px}.fb:last-child{margin-bottom:0}.fn{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.fe{font-size:12.5px;font-weight:500;color:var(--navy);font-family:'Courier New',monospace;line-height:1.6}.fv{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.7}
+.diag-wrap{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}
+.diag-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;justify-content:space-between}.diag-title{font-family:var(--serif);font-size:1rem;color:var(--navy)}.diag-sub{font-size:11px;color:var(--text3)}
+#diagSvg{width:100%;height:auto;display:block}
+table.rt{width:100%;border-collapse:collapse;font-size:12px}.rt th{background:var(--sand);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--sand3)}.rt td{padding:6px 10px;border-bottom:1px solid var(--sand2);color:var(--text)}.rt tr:last-child td{border-bottom:none}.rt tr:hover td{background:var(--sand)}.rt tr.hl td{background:var(--blue-dim);color:var(--blue);font-weight:600}
+.man-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.man-item{background:var(--sand);border:1px solid var(--sand3);border-radius:6px;padding:8px 10px}
+.man-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.man-val{font-family:var(--serif);font-size:1.1rem;color:var(--navy)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="../../index.html">
+    <div class="nav-logo"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div class="nav-wordmark">Transportation<span>Designer</span></div>
+  </a>
+  <span class="nav-sub">Sight Distance Calculator</span>
+</nav>
+
+<div class="page-header"><div class="phbg"></div><div class="phi">
+  <h1>Sight Distance Calculator</h1>
+  <p>Calculate stopping, passing, and decision sight distances with grade correction per AASHTO Green Book</p>
+  <div class="badges">
+    <div class="badge">AASHTO Green Book §3.1–3.3</div>
+    <div class="badge">FDOT Design Standards</div>
+  </div>
+</div></div>
+
+<div class="main">
+
+  <!-- LEFT: INPUTS -->
+  <div>
+    <div class="card">
+      <div class="ch"><div class="ci" style="background:var(--navy)"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><span class="ct">Calculator</span></div>
+      <div class="cb">
+
+        <!-- TYPE TABS -->
+        <div class="type-tabs">
+          <button class="type-tab active" onclick="setType('ssd',this)"><span class="tab-code">SSD</span>Stopping</button>
+          <button class="type-tab" onclick="setType('psd',this)"><span class="tab-code">PSD</span>Passing</button>
+          <button class="type-tab" onclick="setType('dsd',this)"><span class="tab-code">DSD</span>Decision</button>
+        </div>
+
+        <div class="sec-lbl">Design Parameters</div>
+
+        <div class="fg">
+          <div class="fl">Design Speed <span class="fh">Auto-fills AASHTO minimums</span></div>
+          <select class="fs" id="designSpeed" onchange="onSpeedChange()">
+            <option value="">— Select speed —</option>
+            <option value="20">20 mph</option><option value="25">25 mph</option><option value="30">30 mph</option>
+            <option value="35">35 mph</option><option value="40">40 mph</option><option value="45">45 mph</option>
+            <option value="50">50 mph</option><option value="55">55 mph</option><option value="60">60 mph</option>
+            <option value="65">65 mph</option><option value="70">70 mph</option><option value="75">75 mph</option>
+            <option value="80">80 mph</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <div class="fl">Roadway Grade <span class="fh">Affects braking distance</span></div>
+          <select class="fs" id="grade">
+            <option value="-6">-6%</option><option value="-5">-5%</option><option value="-4">-4%</option>
+            <option value="-3">-3%</option><option value="-2">-2%</option><option value="-1">-1%</option>
+            <option value="0" selected>0% (Level)</option>
+            <option value="1">+1%</option><option value="2">+2%</option><option value="3">+3%</option>
+            <option value="4">+4%</option><option value="5">+5%</option><option value="6">+6%</option>
+          </select>
+        </div>
+
+        <div class="sec-lbl">Driver &amp; Vehicle</div>
+
+        <div class="fg">
+          <div class="fl">Perception-Reaction Time <span class="fh">AASHTO: 2.5 sec</span></div>
+          <div class="iw"><input class="fi" type="number" id="prt" placeholder="2.5" value="2.5" step="0.1" min="1"><span class="iu">sec</span></div>
+        </div>
+        <div class="fg">
+          <div class="fl">Deceleration Rate <span class="fh">AASHTO: 11.2 ft/s²</span></div>
+          <div class="iw"><input class="fi" type="number" id="decel" placeholder="11.2" value="11.2" step="0.1" min="5"><span class="iu">ft/s²</span></div>
+        </div>
+
+        <!-- PSD extras -->
+        <div id="psd-extra" style="display:none">
+          <div class="sec-lbl">Passing Parameters</div>
+          <div class="fg">
+            <div class="fl">Speed of Passed Vehicle <span class="fh">Typically V − 15 mph</span></div>
+            <div class="iw"><input class="fi" type="number" id="Vpassed" placeholder="e.g. 50" step="any"><span class="iu">mph</span></div>
+          </div>
+          <div class="fg">
+            <div class="fl">Opposing Vehicle Speed <span class="fh">Typically = design speed</span></div>
+            <div class="iw"><input class="fi" type="number" id="Voppose" placeholder="e.g. 65" step="any"><span class="iu">mph</span></div>
+          </div>
+        </div>
+
+        <!-- DSD extras -->
+        <div id="dsd-extra" style="display:none">
+          <div class="sec-lbl">Avoidance Maneuver</div>
+          <div class="fg">
+            <div class="fl">Maneuver Type</div>
+            <select class="fs" id="dsdMan">
+              <option value="A">A — Stop on rural road</option>
+              <option value="B">B — Stop on urban road</option>
+              <option value="C">C — Speed/path/direction, rural</option>
+              <option value="D">D — Speed/path/direction, suburban</option>
+              <option value="E">E — Speed/path/direction, urban</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="cb-btn" onclick="calculate()">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Calculate
+        </button>
+        <button class="rs-btn" onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div>
+
+    <!-- DIAGRAM -->
+    <div class="diag-wrap">
+      <div class="diag-hdr">
+        <span class="diag-title">Sight Distance Profile</span>
+        <span class="diag-sub" id="diagLabel">Select design speed to update</span>
+      </div>
+      <div style="padding:.75rem 1.25rem 1rem">
+        <svg id="diagSvg" viewBox="0 0 540 155" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="ahB" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#1B6AC9"/></marker>
+            <marker id="ahBL" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path d="M7,0 L7,7 L0,3.5 z" fill="#1B6AC9"/></marker>
+            <marker id="ahG" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#0D7A4E"/></marker>
+            <marker id="ahGL" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path d="M7,0 L7,7 L0,3.5 z" fill="#0D7A4E"/></marker>
+            <marker id="ahO" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#C47D0A"/></marker>
+          </defs>
+          <g id="diagG"></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="card">
+      <div class="ch"><div class="ci" style="background:var(--blue)"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="ct">Results</span></div>
+      <div class="cb">
+
+        <div id="res-ssd">
+          <div class="rg">
+            <div class="rc hi"><div class="rl">Calculated SSD</div><div class="rv" id="r_ssd">—</div></div>
+            <div class="rc" id="rc_min"><div class="rl">AASHTO Min SSD</div><div class="rv" id="r_min">—</div></div>
+            <div class="rc"><div class="rl">Reaction Distance</div><div class="rv" id="r_react">—</div></div>
+            <div class="rc"><div class="rl">Braking Distance</div><div class="rv" id="r_brake">—</div></div>
+          </div>
+          <div id="al_ssd"></div>
+        </div>
+
+        <div id="res-psd" style="display:none">
+          <div class="rg rg3">
+            <div class="rc hi"><div class="rl">Passing Sight Distance</div><div class="rv" id="r_psd">—</div></div>
+            <div class="rc"><div class="rl">AASHTO Min PSD</div><div class="rv" id="r_psdmin">—</div></div>
+            <div class="rc"><div class="rl">Passing Time</div><div class="rv" id="r_psdt">—</div></div>
+          </div>
+          <div id="al_psd"></div>
+        </div>
+
+        <div id="res-dsd" style="display:none">
+          <div class="rg">
+            <div class="rc hi"><div class="rl">Decision Sight Distance</div><div class="rv" id="r_dsd">—</div></div>
+            <div class="rc"><div class="rl">AASHTO Min DSD</div><div class="rv" id="r_dsdmin">—</div></div>
+            <div class="rc"><div class="rl">Maneuver Type</div><div class="rv" id="r_dsdman">—</div></div>
+            <div class="rc"><div class="rl">Pre-Maneuver Time</div><div class="rv" id="r_dsdt">—</div></div>
+          </div>
+          <div id="al_dsd"></div>
+          <div style="margin-top:10px">
+            <div class="fn" style="margin-bottom:6px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">All Maneuvers at Selected Speed</div>
+            <div class="man-grid" id="man_grid"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORMULAS -->
+    <div class="card">
+      <div class="ch"><div class="ci" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="ct">Governing Equations</span></div>
+      <div class="cb">
+        <div id="form-ssd">
+          <div class="fb"><div class="fn">Stopping Sight Distance — AASHTO Eq. 3-1</div><div class="fe">SSD = 1.47Vt + V² / [30(a/g ± G)]</div><div class="fv"><b>V</b> = Speed (mph) · <b>t</b> = PRT (sec) · <b>a</b> = decel (ft/s²) · <b>G</b> = grade (decimal)<br>Use + G for downgrades (increases SSD), − G for upgrades (decreases SSD)<br>AASHTO table values assume level grade (G = 0)</div></div>
+        </div>
+        <div id="form-psd" style="display:none">
+          <div class="fb"><div class="fn">Passing Sight Distance — AASHTO §3.3</div><div class="fe">PSD = d₁ + d₂ + d₃ + d₄</div><div class="fv"><b>d₁</b> = Perception + acceleration distance<br><b>d₂</b> = Distance traveled in opposing lane<br><b>d₃</b> = Clearance gap to opposing vehicle (~200 ft)<br><b>d₄</b> = Opposing vehicle distance during d₂</div></div>
+          <div class="fb"><div class="fn">Note</div><div class="fe">Refer to AASHTO Green Book Table 3-4 for exact tabulated PSD values by speed</div><div class="fv">The calculation here uses the AASHTO component method with typical passing times of 10–14 sec</div></div>
+        </div>
+        <div id="form-dsd" style="display:none">
+          <div class="fb"><div class="fn">Decision Sight Distance — AASHTO §3.3</div><div class="fe">DSD = 1.47V × (t_r + t_m)</div><div class="fv"><b>t_r</b> = Extended perception-reaction time (3.0–4.5 sec for complex scenarios)<br><b>t_m</b> = Avoidance maneuver time (varies 5–11 sec by maneuver type A–E)<br>DSD >> SSD — used at complex decision locations: interchanges, intersections, decision points</div></div>
+          <div class="fb"><div class="fn">Maneuver Types</div><div class="fe">A: Stop rural · B: Stop urban · C–E: Speed/path/direction change</div><div class="fv">Maneuvers C, D, E require significantly more sight distance than stopping maneuvers</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AASHTO REFERENCE TABLES -->
+    <div class="card">
+      <div class="ch"><div class="ci" style="background:#C47D0A"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></div><span class="ct">AASHTO Reference Table</span></div>
+      <div id="tbl-ssd" style="overflow-x:auto">
+        <table class="rt">
+          <thead><tr><th>Speed (mph)</th><th>Min SSD (ft)</th><th>Reaction Dist (ft)</th><th>Braking Dist — Level (ft)</th></tr></thead>
+          <tbody id="ssdTbody"></tbody>
+        </table>
+      </div>
+      <div id="tbl-psd" style="display:none;overflow-x:auto">
+        <table class="rt">
+          <thead><tr><th>Speed (mph)</th><th>Min PSD (ft)</th></tr></thead>
+          <tbody>
+            <tr id="pr20"><td>20</td><td>400</td></tr><tr id="pr25"><td>25</td><td>450</td></tr>
+            <tr id="pr30"><td>30</td><td>500</td></tr><tr id="pr35"><td>35</td><td>550</td></tr>
+            <tr id="pr40"><td>40</td><td>600</td></tr><tr id="pr45"><td>45</td><td>700</td></tr>
+            <tr id="pr50"><td>50</td><td>800</td></tr><tr id="pr55"><td>55</td><td>900</td></tr>
+            <tr id="pr60"><td>60</td><td>1000</td></tr><tr id="pr65"><td>65</td><td>1100</td></tr>
+            <tr id="pr70"><td>70</td><td>1200</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="tbl-dsd" style="display:none;overflow-x:auto">
+        <table class="rt">
+          <thead><tr><th>Speed (mph)</th><th>Man. A (ft)</th><th>Man. B (ft)</th><th>Man. C (ft)</th><th>Man. D (ft)</th><th>Man. E (ft)</th></tr></thead>
+          <tbody id="dsdTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── DATA ───────────────────────────────────────────────────────────────────────
+var SSD_DATA=[[20,115,73,42],[25,155,91,64],[30,200,110,90],[35,250,128,122],[40,305,147,158],[45,360,165,195],[50,425,184,241],[55,495,202,293],[60,570,221,349],[65,645,239,406],[70,730,258,472],[75,820,276,544],[80,910,295,615]];
+var PSD_MAP={20:400,25:450,30:500,35:550,40:600,45:700,50:800,55:900,60:1000,65:1100,70:1200};
+// [speed, A, B, C, D, E]
+var DSD_DATA=[[50,700,700,1000,1100,1100],[55,750,850,1100,1300,1300],[60,850,950,1300,1500,1500],[65,950,1050,1400,1650,1650],[70,1050,1150,1500,1800,1800],[75,1150,1300,1650,1950,1950],[80,1300,1450,1850,2100,2100]];
+var DSD_TIMES={A:3.0,B:4.0,C:9.1,D:10.2,E:11.2};
+var SSD_MAP={},DSD_MAP={};
+SSD_DATA.forEach(function(r){SSD_MAP[r[0]]=r;});
+DSD_DATA.forEach(function(r){DSD_MAP[r[0]]=r;});
+
+var currentType='ssd', currentSpeed=0;
+
+// ── BUILD TABLES ───────────────────────────────────────────────────────────────
+(function(){
+  var tb=document.getElementById('ssdTbody');
+  tb.innerHTML=SSD_DATA.map(function(r){return '<tr id="sr'+r[0]+'"><td>'+r[0]+' mph</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>';}).join('');
+  var db=document.getElementById('dsdTbody');
+  db.innerHTML=DSD_DATA.map(function(r){return '<tr id="dr'+r[0]+'"><td>'+r[0]+' mph</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td></tr>';}).join('');
+  drawDefault();
+})();
+
+// ── TYPE SWITCHING ─────────────────────────────────────────────────────────────
+function setType(type,btn){
+  currentType=type;
+  document.querySelectorAll('.type-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  ['ssd','psd','dsd'].forEach(function(t){
+    var r=document.getElementById('res-'+t),f=document.getElementById('form-'+t),tb=document.getElementById('tbl-'+t);
+    var on=t===type;
+    if(r)r.style.display=on?'':'none';
+    if(f)f.style.display=on?'':'none';
+    if(tb)tb.style.display=on?'':'none';
+  });
+  document.getElementById('psd-extra').style.display=type==='psd'?'':'none';
+  document.getElementById('dsd-extra').style.display=type==='dsd'?'':'none';
+  if(currentSpeed)calculate(); else drawDefault();
+}
+
+// ── SPEED CHANGE ───────────────────────────────────────────────────────────────
+function onSpeedChange(){
+  var spd=parseInt(document.getElementById('designSpeed').value);
+  currentSpeed=spd||0;
+  if(spd){
+    var opp=document.getElementById('Voppose');if(opp&&!opp.value)opp.value=spd;
+    var pas=document.getElementById('Vpassed');if(pas&&!pas.value)pas.value=Math.max(20,spd-15);
+    hlRows(spd);
+    calculate();
+  }
+}
+
+function hlRows(spd){
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  var k=Math.round(spd/5)*5;
+  ['sr','pr','dr'].forEach(function(p){var r=document.getElementById(p+k);if(r)r.classList.add('hl');});
+}
+
+// ── CALCULATE ──────────────────────────────────────────────────────────────────
+function calculate(){
+  var V=parseFloat(document.getElementById('designSpeed').value);
+  var G=parseFloat(document.getElementById('grade').value)/100;
+  var t=parseFloat(document.getElementById('prt').value)||2.5;
+  var a=parseFloat(document.getElementById('decel').value)||11.2;
+  if(isNaN(V)){alert('Select a design speed.');return;}
+  currentSpeed=V;
+  if(currentType==='ssd')calcSSD(V,G,t,a);
+  else if(currentType==='psd')calcPSD(V,G,t,a);
+  else calcDSD(V,G,t,a);
+  hlRows(V);
+}
+
+function calcSSD(V,G,t,a){
+  var Vfps=V*1.467,react=Vfps*t,brake=Vfps*Vfps/(2*(a+32.2*G)),ssd=react+brake;
+  sv('r_ssd',ssd.toFixed(0)+' ft');sv('r_react',react.toFixed(0)+' ft');sv('r_brake',brake.toFixed(0)+' ft');
+  var k=Math.round(V/5)*5,row=SSD_MAP[k],aMin=row?row[1]:null;
+  sv('r_min',aMin?aMin+' ft':'—');
+  var box=document.getElementById('al_ssd');
+  if(aMin){var ok=ssd>=aMin;box.innerHTML='<div class="al al-'+(ok?'ok':'wn')+'">'+(ok?'&#10003;':'&#9888;')+' SSD '+(ok?'meets':'is below')+' AASHTO minimum of '+aMin+' ft for '+V+' mph'+(G!==0?' (grade-adjusted)':'')+'.</div>';}
+  else box.innerHTML='';
+  drawSSD(react,brake,ssd,V,G);
+}
+
+function calcPSD(V,G,t,a){
+  var Vfps=V*1.467;
+  var tPass=Math.max(10,14-(V-30)*0.08);
+  var d1=Vfps*(t+2.0),d2=Vfps*tPass,d3=200;
+  var Vopp=parseFloat(document.getElementById('Voppose').value)||V;
+  var d4=Vopp*1.467*tPass;
+  var psd=d1+d2+d3+d4;
+  sv('r_psd',psd.toFixed(0)+' ft');sv('r_psdt',tPass.toFixed(1)+' sec');
+  var k=Math.round(V/5)*5,aMin=PSD_MAP[k];
+  sv('r_psdmin',aMin?aMin+' ft':'—');
+  var box=document.getElementById('al_psd');
+  if(aMin){var ok=psd>=aMin;box.innerHTML='<div class="al al-'+(ok?'ok':'wn')+'">'+(ok?'&#10003;':'&#9888;')+' PSD '+(ok?'meets':'is below')+' AASHTO minimum of '+aMin+' ft for '+V+' mph. Two-lane passing zones require full clear sight line.</div>';}
+  else box.innerHTML='';
+  drawPSD(d1,d2,d3,d4,V);
+}
+
+function calcDSD(V,G,t,a){
+  var man=document.getElementById('dsdMan').value;
+  var k=Math.round(V/5)*5,row=DSD_MAP[k];
+  var idx={A:1,B:2,C:3,D:4,E:5};
+  var dsd=row?row[idx[man]]:null;
+  sv('r_dsd',dsd?dsd+' ft':'—');sv('r_dsdman','Type '+man);sv('r_dsdt',DSD_TIMES[man].toFixed(1)+' sec');
+  sv('r_dsdmin',dsd?dsd+' ft':'—');
+  // Fill maneuver grid
+  var grid=document.getElementById('man_grid');
+  var lbls={A:'Stop Rural',B:'Stop Urban',C:'Rural S/P/D',D:'Suburban S/P/D',E:'Urban S/P/D'};
+  grid.innerHTML=Object.keys(lbls).map(function(m){
+    var val=row?row[idx[m]]+'ft':'—';
+    return '<div class="man-item"><div class="man-lbl">Man. '+m+' — '+lbls[m]+'</div><div class="man-val">'+val+'</div></div>';
+  }).join('');
+  var box=document.getElementById('al_dsd');
+  if(dsd)box.innerHTML='<div class="al al-info">&#9432; Decision sight distance (Maneuver '+man+') at '+V+' mph = <strong>'+dsd+' ft</strong>. Provide at complex decision points: interchanges, intersections, decision zones.</div>';
+  drawDSD(dsd,V,man);
+}
+
+// ── SVG DIAGRAM ────────────────────────────────────────────────────────────────
+var NS='http://www.w3.org/2000/svg';
+function svgEl(tag,a){var e=document.createElementNS(NS,tag);Object.keys(a).forEach(function(k){e.setAttribute(k,a[k]);});return e;}
+function svgRect(x,y,w,h,fill,rx){return svgEl('rect',{x:x,y:y,width:Math.max(0,w),height:h,fill:fill,rx:rx||0});}
+function svgLine(x1,y1,x2,y2,stroke,sw,da){var a={x1:x1,y1:y1,x2:x2,y2:y2,stroke:stroke,'stroke-width':sw||1};if(da)a['stroke-dasharray']=da;return svgEl('line',a);}
+function svgCirc(cx,cy,r,fill){return svgEl('circle',{cx:cx,cy:cy,r:r,fill:fill});}
+function svgTxt(x,y,str,fill,sz,anchor,weight){var e=svgEl('text',{x:x,y:y,'font-family':'DM Sans,sans-serif','font-size':sz||10,fill:fill||'#0f2340','text-anchor':anchor||'middle'});if(weight)e.setAttribute('font-weight',weight);e.textContent=str;return e;}
+function svgArrow(x1,y1,x2,y2,color){var mid=color==='#0D7A4E'?'G':color==='#C47D0A'?'O':'B';var l=svgLine(x1,y1,x2,y2,color,1.5);l.setAttribute('marker-end','url(#ah'+mid+')');l.setAttribute('marker-start','url(#ah'+mid+'L)');return l;}
+
+function clearDiag(){document.getElementById('diagG').innerHTML='';}
+
+function roadBase(g,W,H,roadY,roadH){
+  g.appendChild(svgRect(0,0,W,H,'#F5F2ED'));
+  g.appendChild(svgRect(0,roadY,W,roadH,'#CBD5E1'));
+  g.appendChild(svgLine(0,roadY,W,roadY,'#94A3B8',1));
+  g.appendChild(svgLine(0,roadY+roadH,W,roadY+roadH,'#94A3B8',1));
+  g.appendChild(svgLine(0,roadY+roadH/2,W,roadY+roadH/2,'white',1.5,'16,8'));
+}
+
+function drawDefault(){
+  clearDiag();
+  var g=document.getElementById('diagG');
+  g.appendChild(svgRect(0,0,540,155,'#F5F2ED'));
+  roadBase(g,540,155,57,40);
+  g.appendChild(svgTxt(270,135,'Select a design speed to generate the sight distance profile','#7A90A8',11));
+  document.getElementById('diagLabel').textContent='Select speed to update';
+}
+
+function drawSSD(react,brake,ssd,V,G){
+  clearDiag();
+  var g=document.getElementById('diagG');
+  var W=540,H=155,roadY=55,roadH=42;
+  var pad=35,maxW=W-pad-20;
+  var scale=Math.min(maxW/ssd,1);
+  var rPx=react*scale,bPx=brake*scale,sPx=ssd*scale;
+  roadBase(g,W,H,roadY,roadH);
+  if(G!==0){g.appendChild(svgTxt(W-8,roadY-7,(G>0?'+':'')+(G*100).toFixed(0)+'% grade','#C47D0A',9,'end'));}
+  // Zones
+  g.appendChild(svgRect(pad,roadY+2,rPx,roadH-4,'rgba(27,106,201,.18)'));
+  g.appendChild(svgRect(pad+rPx,roadY+2,bPx,roadH-4,'rgba(185,28,28,.13)'));
+  // Driver
+  g.appendChild(svgCirc(pad,roadY+roadH/2,7,'#1B6AC9'));g.appendChild(svgCirc(pad,roadY+roadH/2,3,'white'));
+  // Hazard
+  g.appendChild(svgRect(pad+sPx-5,roadY+5,10,roadH-10,'#B91C1C',2));
+  // SSD arrow
+  var arr=svgLine(pad,roadY-18,pad+sPx,roadY-18,'#1B6AC9',1.5);
+  arr.setAttribute('marker-end','url(#ahB)');arr.setAttribute('marker-start','url(#ahBL)');
+  g.appendChild(arr);
+  g.appendChild(svgTxt((pad+pad+sPx)/2,roadY-22,'SSD = '+ssd.toFixed(0)+' ft','#1B6AC9',10,'middle','600'));
+  // Segment labels
+  g.appendChild(svgTxt(pad+rPx/2,roadY+roadH+13,'Reaction '+react.toFixed(0)+' ft','#1B6AC9',9,'middle'));
+  g.appendChild(svgTxt(pad+rPx+bPx/2,roadY+roadH+13,'Braking '+brake.toFixed(0)+' ft','#B91C1C',9,'middle'));
+  // Labels
+  g.appendChild(svgTxt(pad,roadY+roadH/2+4,'DRIVER','white',8,'middle','600'));
+  g.appendChild(svgTxt(pad+sPx,roadY-5,'OBJECT','#B91C1C',8,'middle'));
+  document.getElementById('diagLabel').textContent='V = '+V+' mph · PRT '+parseFloat(document.getElementById('prt').value)+' s · SSD = '+ssd.toFixed(0)+' ft'+(G!==0?' · Grade '+(G>0?'+':'')+(G*100).toFixed(0)+'%':'');
+}
+
+function drawPSD(d1,d2,d3,d4,V){
+  clearDiag();
+  var g=document.getElementById('diagG');
+  var W=540,H=155;
+  var total=d1+d2+d3+d4,scale=(W-50)/total;
+  var pad=25,laneY=45,laneH=28,oppY=78,oppH=28;
+  g.appendChild(svgRect(0,0,W,H,'#F5F2ED'));
+  // Lanes
+  g.appendChild(svgRect(0,laneY,W,laneH,'#CBD5E1'));
+  g.appendChild(svgRect(0,oppY,W,oppH,'#CBD5E1'));
+  g.appendChild(svgLine(0,laneY,W,laneY,'#94A3B8',1));
+  g.appendChild(svgLine(0,oppY+oppH,W,oppY+oppH,'#94A3B8',1));
+  g.appendChild(svgLine(0,(laneY+laneH+oppY)/2,W,(laneY+laneH+oppY)/2,'#94A3B8',1,'10,6'));
+  var x0=pad,x1=x0+d1*scale,x2=x1+d2*scale,x3=x2+d3*scale,x4=x3+d4*scale;
+  // Passing zone
+  g.appendChild(svgRect(x1,oppY+2,d2*scale,oppH-4,'rgba(27,106,201,.2)'));
+  // Passed veh
+  g.appendChild(svgRect(x0-5,laneY+4,10,laneH-8,'#94A3B8',3));
+  // Passing veh
+  g.appendChild(svgCirc(x0,laneY+laneH/2,5,'#1B6AC9'));
+  // Opposing veh
+  g.appendChild(svgCirc(x4,oppY+oppH/2,5,'#B91C1C'));
+  // PSD arrow
+  var arr=svgLine(x0,laneY-14,x4,laneY-14,'#0D7A4E',1.5);arr.setAttribute('marker-end','url(#ahG)');arr.setAttribute('marker-start','url(#ahGL)');g.appendChild(arr);
+  g.appendChild(svgTxt((x0+x4)/2,laneY-18,'PSD = '+(d1+d2+d3+d4).toFixed(0)+' ft','#0D7A4E',10,'middle','600'));
+  // Segment labels
+  [[x0,x1,'d₁'],[x1,x2,'d₂'],[x2,x3,'d₃'],[x3,x4,'d₄']].forEach(function(s){
+    g.appendChild(svgLine(s[0],oppY+oppH+10,s[1],oppY+oppH+10,'#475569',.8));
+    g.appendChild(svgTxt((s[0]+s[1])/2,oppY+oppH+22,s[2]+' '+((s[1]-s[0])/scale).toFixed(0)+'ft','#475569',8,'middle'));
+  });
+  document.getElementById('diagLabel').textContent='V = '+V+' mph · PSD = '+(d1+d2+d3+d4).toFixed(0)+' ft';
+}
+
+function drawDSD(dsd,V,man){
+  clearDiag();
+  var g=document.getElementById('diagG');
+  var W=540,H=155,roadY=55,roadH=42;
+  roadBase(g,W,H,roadY,roadH);
+  if(!dsd){g.appendChild(svgTxt(270,135,'DSD data not available for '+V+' mph (min 50 mph)','#7A90A8',10));document.getElementById('diagLabel').textContent='DSD data starts at 50 mph';return;}
+  var pad=35,scale=Math.min((W-pad-20)/dsd,1),dsdPx=dsd*scale;
+  var tPre=DSD_TIMES[man],prePx=Math.min(V*1.467*tPre*scale,dsdPx*0.65);
+  g.appendChild(svgRect(pad,roadY+2,dsdPx,roadH-4,'rgba(196,125,10,.12)'));
+  g.appendChild(svgRect(pad,roadY+2,prePx,roadH-4,'rgba(196,125,10,.25)'));
+  g.appendChild(svgCirc(pad,roadY+roadH/2,7,'#1B6AC9'));g.appendChild(svgCirc(pad,roadY+roadH/2,3,'white'));
+  // Decision line
+  var dl=svgLine(pad+prePx,roadY,pad+prePx,roadY+roadH,'#C47D0A',2);dl.setAttribute('stroke-dasharray','5,3');g.appendChild(dl);
+  g.appendChild(svgTxt(pad+prePx,roadY-6,'Decision Point','#C47D0A',8,'middle','600'));
+  // DSD arrow
+  var arr=svgLine(pad,roadY-18,pad+dsdPx,roadY-18,'#C47D0A',1.5);arr.setAttribute('marker-end','url(#ahO)');g.appendChild(arr);
+  g.appendChild(svgTxt((pad+pad+dsdPx)/2,roadY-22,'DSD = '+dsd+' ft (Man. '+man+')','#C47D0A',10,'middle','600'));
+  g.appendChild(svgTxt(pad+prePx/2,roadY+roadH+13,'Pre-maneuver · '+tPre+' sec','#C47D0A',9,'middle'));
+  g.appendChild(svgTxt(pad,roadY+roadH/2+4,'DRIVER','white',8,'middle','600'));
+  document.getElementById('diagLabel').textContent='V = '+V+' mph · DSD Maneuver '+man+' = '+dsd+' ft · Pre-maneuver: '+tPre+' sec';
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────────────
+function sv(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+
+function resetAll(){
+  document.getElementById('designSpeed').value='';
+  document.getElementById('grade').value='0';
+  document.getElementById('prt').value='2.5';
+  document.getElementById('decel').value='11.2';
+  ['Vpassed','Voppose'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['r_ssd','r_min','r_react','r_brake','r_psd','r_psdmin','r_psdt','r_dsd','r_dsdmin','r_dsdman','r_dsdt'].forEach(function(id){sv(id,'—');});
+  ['al_ssd','al_psd','al_dsd','man_grid'].forEach(function(id){sv(id,'');});
+  document.querySelectorAll('.rt tr').forEach(function(r){r.classList.remove('hl');});
+  currentSpeed=0;
+  drawDefault();
+}
+</script>
+</body>
+</html>

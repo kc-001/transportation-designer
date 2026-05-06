@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Axle Load → ESAL / VDF Converter — TransportationDesigner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2340;--navy-light:#234570;--blue:#1B6AC9;--blue-dim:rgba(27,106,201,.10);--blue-border:rgba(27,106,201,.25);--sand:#F5F2ED;--sand2:#EDE9E2;--sand3:#DDD8CF;--text:#0f2340;--text2:#3D5470;--text3:#7A90A8;--ok:#0D7A4E;--ok-dim:rgba(13,122,78,.10);--ok-border:rgba(13,122,78,.25);--warn:#C47D0A;--warn-dim:rgba(196,125,10,.10);--warn-border:rgba(196,125,10,.25);--danger:#B91C1C;--danger-dim:rgba(185,28,28,.10);--danger-border:rgba(185,28,28,.25);--radius:8px;--radius-lg:14px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--shadow-sm:0 1px 3px rgba(15,35,64,.08)}
+html{scroll-behavior:smooth}body{font-family:var(--sans);background:var(--sand);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--sand3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}.nav-logo{width:30px;height:30px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center}.nav-logo svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2}.nav-wordmark{font-family:var(--serif);font-size:15px;color:var(--navy)}.nav-wordmark span{color:var(--blue)}.nav-sub{font-size:11px;color:var(--text3);padding-left:12px;border-left:1px solid var(--sand3)}
+.page-header{background:var(--navy);padding:2.25rem 2rem 2rem;position:relative;overflow:hidden}.page-header-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}.page-header-inner{max-width:980px;margin:0 auto;position:relative}.page-header h1{font-family:var(--serif);font-size:1.65rem;color:white;letter-spacing:-.02em;line-height:1.2}.page-header p{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px}.ref-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;padding:4px 10px;border-radius:20px;font-weight:500;margin-top:10px}
+.main{max-width:980px;margin:0 auto;padding:1.5rem 2rem 4rem;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:780px){.main{grid-template-columns:1fr;padding:1rem}}
+.card{background:white;border:1px solid var(--sand3);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}.card:last-child{margin-bottom:0}
+.card-header{padding:.9rem 1.25rem;border-bottom:1px solid var(--sand2);display:flex;align-items:center;gap:10px}.card-icon{width:32px;height:32px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0}.card-icon svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8}.card-title{font-family:var(--serif);font-size:1rem;color:var(--navy)}.card-body{padding:1.1rem 1.25rem}
+.form-group{margin-bottom:12px}.form-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}.form-hint{font-size:10px;color:var(--text3);font-weight:400}.input-wrap{position:relative}
+.form-input,.form-select{width:100%;font-family:var(--sans);font-size:13px;color:var(--text);background:white;border:1px solid var(--sand3);border-radius:var(--radius);padding:9px 12px;outline:none;transition:border-color .15s}.form-input{padding-right:50px}.form-input:focus,.form-select:focus{border-color:var(--blue-border)}.form-input::placeholder{color:var(--text3)}.input-unit{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:500;pointer-events:none}
+.calc-btn{width:100%;font-family:var(--sans);font-size:14px;font-weight:500;padding:12px;border-radius:var(--radius);border:none;background:var(--navy);color:white;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px}.calc-btn:hover{background:var(--navy-light);transform:translateY(-1px)}.reset-btn{width:100%;font-family:var(--sans);font-size:12px;padding:8px;border-radius:var(--radius);border:1px solid var(--sand3);background:white;color:var(--text3);cursor:pointer;margin-top:8px;transition:all .15s}.reset-btn:hover{background:var(--sand);color:var(--text)}
+.results-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:1rem}
+.result-card{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:12px 14px}.result-card.hi{background:var(--blue-dim);border-color:var(--blue-border)}.result-card.ok{background:var(--ok-dim);border-color:var(--ok-border)}.result-card.warn{background:var(--warn-dim);border-color:var(--warn-border)}.result-card.danger{background:var(--danger-dim);border-color:var(--danger-border)}
+.rl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px}.rv{font-family:var(--serif);font-size:1.55rem;color:var(--navy);line-height:1}.result-card.hi .rv{color:var(--blue)}.result-card.ok .rv{color:var(--ok)}.result-card.warn .rv{color:var(--warn)}.result-card.danger .rv{color:var(--danger)}.ru{font-size:11px;color:var(--text3);margin-left:3px}.rn{font-size:11px;color:var(--text2);margin-top:3px}
+.formula-block{background:var(--sand);border:1px solid var(--sand3);border-radius:var(--radius);padding:11px 13px;margin-bottom:9px}.fn{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.fe{font-size:12.5px;font-weight:500;color:var(--navy);font-family:'Courier New',monospace;line-height:1.5}.fv{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.7}
+.alert{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-top:10px;border:1px solid transparent;line-height:1.5}.alert-warn{background:var(--warn-dim);border-color:var(--warn-border);color:var(--warn)}.alert-ok{background:var(--ok-dim);border-color:var(--ok-border);color:var(--ok)}.alert-danger{background:var(--danger-dim);border-color:var(--danger-border);color:var(--danger)}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="../../index.html"><div class="nav-logo"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="nav-wordmark">Transportation<span>Designer</span></div></a>
+  <span class="nav-sub">Axle Load → ESAL / VDF Converter</span>
+</nav>
+<div class="page-header"><div class="page-header-bg"></div><div class="page-header-inner">
+  <h1>Axle Load → ESAL / VDF Converter</h1>
+  <p>Convert axle loads to Equivalent Single Axle Loads using the AASHTO fourth-power law</p>
+  <div class="ref-badge">AASHTO Pavement Design Guide · 4th Power Law</div>
+</div></div>
+<div class="main">
+  <div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg></div><span class="card-title">Inputs</span></div>
+      <div class="card-body">
+        <div class="form-group"><div class="form-label">Axle Load <span class="form-hint">Applied load</span></div><div class="input-wrap"><input class="form-input" type="number" id="axleLoad" placeholder="e.g. 22" step="any" min="0"><span class="input-unit">kip</span></div></div>
+        <div class="form-group"><div class="form-label">Standard Axle Load <span class="form-hint">Default 18 kip</span></div><div class="input-wrap"><input class="form-input" type="number" id="stdAxle" placeholder="18" step="any" min="0"><span class="input-unit">kip</span></div></div>
+        <div class="form-group"><div class="form-label">Axle Type</div><select class="form-select" id="axleType"><option value="single">Single Axle</option><option value="tandem">Tandem Axle</option><option value="tridem">Tridem Axle</option></select></div>
+        <button class="calc-btn" onclick="calculate()">Calculate</button>
+        <button class="reset-btn" onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon" style="background:var(--ok)"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="card-title">Results</span></div>
+      <div class="card-body">
+        <div class="results-grid">
+          <div class="result-card hi"><div class="rl">ESAL (Load Equiv. Factor)</div><div class="rv" id="r_esal">—</div></div>
+          <div class="result-card hi"><div class="rl">VDF (Vehicle Damage Factor)</div><div class="rv" id="r_vdf">—</div></div>
+        </div>
+        <div id="alertBox"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon" style="background:#0D7A4E"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="card-title">Formulas</span></div>
+      <div class="card-body">
+        <div class="formula-block"><div class="fn">Fourth Power Law (AASHTO)</div><div class="fe">ESAL = (L / L_s)⁴</div><div class="fv"><b>L</b> = Applied axle load (kip)<br><b>L_s</b> = Standard axle load (18 kip)<br><b>ESAL</b> = Load Equivalency Factor (LEF)</div></div>
+        <div class="formula-block"><div class="fn">Axle Type Correction Factors</div><div class="fe">Single: ×1.0 · Tandem: ×0.773 · Tridem: ×0.524</div><div class="fv">Approximate AASHTO equivalency factors relative to single axle</div></div>
+        <div class="formula-block"><div class="fn">Interpretation</div><div class="fe">ESAL &lt; 1 → less damaging than standard<br>ESAL &gt; 1 → more damaging than standard</div><div class="fv">An 18-kip single axle = 1.0 ESAL by definition</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon" style="background:#C47D0A"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="card-title">ESAL Quick Reference</span></div>
+      <div class="card-body">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr><th style="background:var(--sand);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--sand3)">Axle Load (kip)</th><th style="background:var(--sand);padding:7px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--sand3)">ESAL (Single)</th></tr></thead>
+          <tbody id="esalTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const LOADS=[6,8,10,12,14,16,18,20,22,24,26,30,34,40];
+function buildTable(){
+  const tb=document.getElementById('esalTable');
+  tb.innerHTML=LOADS.map(l=>{
+    const e=Math.pow(l/18,4);
+    return '<tr><td style="padding:6px 10px;border-bottom:1px solid var(--sand2)">'+l+'</td><td style="padding:6px 10px;border-bottom:1px solid var(--sand2);text-align:right;font-family:monospace">'+e.toFixed(4)+'</td></tr>';
+  }).join('');
+}
+buildTable();
+function calculate(){
+  const L=parseFloat(document.getElementById('axleLoad').value);
+  const Ls=parseFloat(document.getElementById('stdAxle').value)||18;
+  const type=document.getElementById('axleType').value;
+  if(isNaN(L)||L<=0){alert('Enter a valid axle load.');return;}
+  let esal=Math.pow(L/Ls,4);
+  if(type==='tandem')esal*=0.773;
+  if(type==='tridem')esal*=0.524;
+  document.getElementById('r_esal').textContent=esal.toFixed(4);
+  document.getElementById('r_vdf').textContent=esal.toFixed(4);
+  const box=document.getElementById('alertBox');
+  if(L>Ls){box.innerHTML='<div class="alert alert-warn">⚠ Axle load exceeds standard — ESAL > 1.0. Significant pavement damage per pass.</div>';}
+  else{box.innerHTML='<div class="alert alert-ok">✓ Axle load below standard — ESAL < 1.0. Below average pavement wear.</div>';}
+}
+function resetAll(){
+  ['axleLoad','stdAxle'].forEach(id=>{document.getElementById(id).value='';});
+  ['r_esal','r_vdf'].forEach(id=>{document.getElementById(id).textContent='—';});
+  document.getElementById('alertBox').innerHTML='';
+}
+</script>
+</body>
+</html>
